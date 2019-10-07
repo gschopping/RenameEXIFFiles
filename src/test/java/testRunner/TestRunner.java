@@ -5,7 +5,7 @@ import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(features = "features//RenameFiles.feature", glue = "stepDefinitions")
+@CucumberOptions(features = "features", glue = "stepDefinitions")
 
 public class TestRunner {
 }
