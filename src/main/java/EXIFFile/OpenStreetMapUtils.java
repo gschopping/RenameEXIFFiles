@@ -41,7 +41,7 @@ public class OpenStreetMapUtils {
         con.setRequestProperty("Host", "nominatim.openstreetmap.org");
         con.setRequestProperty("TE", "Trailers");;
         con.setRequestProperty("Upgrade-Insecure-Requests", "1");
-        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0");
+        con.setRequestProperty("User-Agent", "Rename mediafiles");
 
         if (con.getResponseCode() != 200) {
             String respnseMessage = con.getResponseMessage();
