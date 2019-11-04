@@ -1,0 +1,8 @@
+target/
+*.class
+*.ARW
+*.JPG
+*.jpg
+*.MP4
+*.m2ts
+*.txt
