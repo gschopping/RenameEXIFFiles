@@ -12,10 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 public class ReadYaml {
-    private TimeLine objYaml;
+    private timeLines timeLines;
+    private Object objectYaml;
+    private Iterable<Object> objectAll;
 
-    public class TimeLocation {
-        private Date startdate;
+    public class timeLine {
+        private String startdate;
         private String title;
         private String countrycode;
         private String country;
@@ -25,9 +27,9 @@ public class ReadYaml {
         private String description;
         private String creator;
         private String website;
-        private String copyRight;
+        private String copyright;
 
-        public Date getStartdate() {
+        public String getStartdate() {
             return startdate;
         }
 
@@ -67,11 +69,11 @@ public class ReadYaml {
             return website;
         }
 
-        public String getCopyRight() {
-            return copyRight;
+        public String getCopyright() {
+            return copyright;
         }
 
-        public void setStartdate(Date startdate) {
+        public void setStartdate(String startdate) {
             this.startdate = startdate;
         }
 
@@ -111,8 +113,8 @@ public class ReadYaml {
             this.website = website;
         }
 
-        public void setCopyRight(String copyRight) {
-            this.copyRight = copyRight;
+        public void setCopyRight(String copyright) {
+            this.copyright = copyright;
         }
     }
 
@@ -123,7 +125,7 @@ public class ReadYaml {
         private String city;
         private String creator;
         private String website;
-        private String copyRight;
+        private String copyright;
 
         public String getCountrycode() {
             return countrycode;
@@ -173,44 +175,56 @@ public class ReadYaml {
             this.website = website;
         }
 
-        public String getCopyRight() {
-            return copyRight;
+        public String getCopyright() {
+            return copyright;
         }
 
-        public void setCopyRight(String copyRight) {
-            this.copyRight = copyRight;
+        public void setCopyRight(String copyright) {
+            this.copyright = copyright;
         }
     }
 
-    public  class  TimeLine {
-        private DefaultLocation defaultLocation;
-        private List<TimeLocation> timeLocation;
+    public  class  timeLines {
+//        private DefaultLocation defaultLocation;
+//        private Object defaultLocation;
+        private List<timeLine> timeline;
 
-        public List<TimeLocation> getTimeLocation() {
-            return timeLocation;
+        public List<timeLine> getTimeLine() {
+            return timeline;
         }
 
-        public void setTimeLocation(List<TimeLocation> timeLocation) {
-            this.timeLocation = timeLocation;
+        public void setTimeLine(List<timeLine> timeline) {
+            this.timeline = timeline;
         }
 
-        public DefaultLocation getDefaultLocation() {
-            return defaultLocation;
-        }
+//        public Object getDefaultLocation() {
+//            return defaultLocation;
+//        }
 
-        public void setDefaultLocation(DefaultLocation defaultLocation) {
-            this.defaultLocation = defaultLocation;
-        }
+//        public void setDefaultLocation(Object defaultLocation) {
+//            this.defaultLocation = defaultLocation;
+//        }
     }
 
     public ReadYaml(String configFile) throws FileNotFoundException {
         InputStream input = new FileInputStream(new File(configFile));
-        Yaml yaml = new Yaml(new Constructor(TimeLine.class));
-        this.objYaml = yaml.load(input);
+        Yaml yaml = new Yaml(new Constructor(timeLines.class));
+        this.timeLines = yaml.load(input);
+//        Yaml yaml = new Yaml();
+//        this.objectYaml = yaml.load(input);
+//        this.objectAll = yaml.loadAll(input);
     }
 
-    public TimeLocation getTimeLocation(int index) {
-        return this.objYaml.getTimeLocation().get(index);
+    public timeLine getTimeLine(int index) {
+        return this.timeLines.getTimeLine().get(index);
 
+    }
+
+    public Object getObjectYaml() {
+        return this.objectYaml;
+    }
+
+    public Iterable<Object> getObjectAllYaml() {
+        return this.objectAll;
     }
 }
