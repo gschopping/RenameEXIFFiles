@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -67,23 +69,13 @@ public class main {
 
     }
 
-    public static void main(String[] args) throws IOException {
-//        Yaml yaml = new Yaml();
-//        String document = "\n- Hesperiidae\n- Papilionidae\n- Apatelodidae\n- Epiplemidae";
-//        List<String> list = (List<String>) yaml.load(document);
-//        System.out.println(list.get(0));
+    public static void main(String[] args) throws IOException, ParseException {
 
-        String document = "firstName: \"John\"\n" +
-                "lastName: \"Doe\"\n" +
-                "age: 31\n";
-
-
-        Constructor constructor = new Constructor(Customer.class);
-//        TypeDescription customerDescription = new TypeDescription(Customer.class);
-        Yaml yaml = new Yaml();
-        InputStream input = Files.newInputStream(Path.of("Z:\\workspace\\resources\\address.yaml"));
-        Map customer = yaml.load(input);
-        System.out.println(customer.get("homeAddress"));
+        ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\start_plain.yml");
+        for (ReadYaml.timeLine timeLine : readYaml.getTimeLines()) {
+            System.out.println(timeLine.getStartdate() +  "  ==> " + timeLine.getEnddate());
+            System.out.println(timeLine.getDescription());
+        }
     }
 
 }

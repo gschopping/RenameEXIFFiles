@@ -7,17 +7,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class ReadYaml {
-    private timeLines timeLines;
-    private Object objectYaml;
-    private Iterable<Object> objectAll;
+    private List<timeLine> timeLines;
 
     public class timeLine {
-        private String startdate;
+        private Date startdate;
+        private Date enddate;
         private String title;
         private String countrycode;
         private String country;
@@ -29,9 +28,11 @@ public class ReadYaml {
         private String website;
         private String copyright;
 
-        public String getStartdate() {
+        public Date getStartdate() {
             return startdate;
         }
+
+        public Date getEnddate() { return enddate; }
 
         public String getTitle() {
             return title;
@@ -73,8 +74,12 @@ public class ReadYaml {
             return copyright;
         }
 
-        public void setStartdate(String startdate) {
+        public void setStartdate(Date startdate) {
             this.startdate = startdate;
+        }
+
+        public void setEnddate(Date enddate) {
+            this.enddate = enddate;
         }
 
         public void setTitle(String title) {
@@ -82,7 +87,12 @@ public class ReadYaml {
         }
 
         public void setCountrycode(String countrycode) {
-            this.countrycode = countrycode;
+            Locale obj = new Locale("", countrycode);
+            if (obj != null) {
+                this.countrycode = obj.getCountry();
+            } else {
+                this.countrycode = "";
+            }
         }
 
         public void setCountry(String country) {
@@ -118,113 +128,91 @@ public class ReadYaml {
         }
     }
 
-    public class  DefaultLocation {
-        private String countrycode;
-        private String country;
-        private String province;
-        private String city;
-        private String creator;
-        private String website;
-        private String copyright;
-
-        public String getCountrycode() {
-            return countrycode;
+    class SortbyDate implements Comparator<timeLine> {
+        @Override
+        public int compare(timeLine o1, timeLine o2) {
+            return o1.getStartdate().compareTo(o2.getStartdate());
         }
 
-        public void setCountrycode(String countrycode) {
-            this.countrycode = countrycode;
-        }
-
-        public String getCountry() {
-            return country;
-        }
-
-        public void setCountry(String country) {
-            this.country = country;
-        }
-
-        public String getProvince() {
-            return province;
-        }
-
-        public void setProvince(String province) {
-            this.province = province;
-        }
-
-        public String getCity() {
-            return city;
-        }
-
-        public void setCity(String city) {
-            this.city = city;
-        }
-
-        public String getCreator() {
-            return creator;
-        }
-
-        public void setCreator(String creator) {
-            this.creator = creator;
-        }
-
-        public String getWebsite() {
-            return website;
-        }
-
-        public void setWebsite(String website) {
-            this.website = website;
-        }
-
-        public String getCopyright() {
-            return copyright;
-        }
-
-        public void setCopyRight(String copyright) {
-            this.copyright = copyright;
-        }
     }
 
-    public  class  timeLines {
-//        private DefaultLocation defaultLocation;
-//        private Object defaultLocation;
-        private List<timeLine> timeline;
-
-        public List<timeLine> getTimeLine() {
-            return timeline;
-        }
-
-        public void setTimeLine(List<timeLine> timeline) {
-            this.timeline = timeline;
-        }
-
-//        public Object getDefaultLocation() {
-//            return defaultLocation;
-//        }
-
-//        public void setDefaultLocation(Object defaultLocation) {
-//            this.defaultLocation = defaultLocation;
-//        }
-    }
-
-    public ReadYaml(String configFile) throws FileNotFoundException {
+    public ReadYaml(String configFile) throws FileNotFoundException, ParseException {
+        this.timeLines = new ArrayList<timeLine> ();
         InputStream input = new FileInputStream(new File(configFile));
-        Yaml yaml = new Yaml(new Constructor(timeLines.class));
-        this.timeLines = yaml.load(input);
-//        Yaml yaml = new Yaml();
-//        this.objectYaml = yaml.load(input);
-//        this.objectAll = yaml.loadAll(input);
+        Yaml yaml = new Yaml();
+        Map timeLine = yaml.load(input);
+        if (timeLine.get("timeline") != null) {
+            ArrayList<Map> timelineArray = (ArrayList<Map>) timeLine.get("timeline");
+            for (Map timelineItem : timelineArray) {
+                setTimeLine(timelineItem);
+            }
+        }
     }
 
-    public timeLine getTimeLine(int index) {
-        return this.timeLines.getTimeLine().get(index);
-
+    private void setTimeLine(Map item) throws ParseException {
+        timeLine timeline = new timeLine();
+        String value = "";
+        if (item.get("countrycode") != null) {
+            value = (String) item.get("countrycode");
+            timeline.setCountrycode(value);
+        }
+        if (item.get("country") != null) {
+            value = (String) item.get("country");
+            timeline.setCountry(value);
+        }
+        if (item.get("province") != null) {
+            value = (String) item.get("province");
+            timeline.setProvince(value);
+        }
+        if (item.get("city") != null) {
+            value = (String) item.get("city");
+            timeline.setCity(value);
+        }
+        if (item.get("creator") != null) {
+            value = (String) item.get("creator");
+            timeline.setCreator(value);
+        }
+        if (item.get("website") != null) {
+            value = (String) item.get("website");
+            timeline.setWebsite(value);
+        }
+        if (item.get("copyright") != null) {
+            value = (String) item.get("copyright");
+            timeline.setCopyRight(value);
+        }
+        if (item.get("startdate") != null) {
+            Date date = (Date) item.get("startdate");
+            timeline.setStartdate(date);
+        }
+        if (item.get("title") != null) {
+            value = (String) item.get("title");
+            timeline.setTitle(value);
+        }
+        if (item.get("location") != null) {
+            value = (String) item.get("location");
+            timeline.setLocation(value);
+        }
+        if (item.get("description") != null) {
+            value = (String) item.get("description");
+            timeline.setDescription(value);
+        }
+        timeLines.add(timeline);
     }
 
-    public Object getObjectYaml() {
-        return this.objectYaml;
+    private void setEnddate() {
+        Date date = null;
+        for (int count = this.timeLines.size() - 1; count >= 0; count--) {
+            if (count < this.timeLines.size() - 1) {
+                this.timeLines.get(count).setEnddate(date);
+            }
+            date = this.timeLines.get(count).getStartdate();
+        }
     }
 
-    public Iterable<Object> getObjectAllYaml() {
-        return this.objectAll;
+    public List<timeLine> getTimeLines() {
+        Collections.sort(this.timeLines, new SortbyDate());
+        setEnddate();
+        return this.timeLines;
     }
+
 }
