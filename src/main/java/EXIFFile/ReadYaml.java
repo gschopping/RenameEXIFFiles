@@ -136,7 +136,7 @@ public class ReadYaml {
 
     }
 
-    public ReadYaml(String configFile) throws FileNotFoundException, ParseException {
+    public ReadYaml(String configFile) throws FileNotFoundException {
         this.timeLines = new ArrayList<timeLine> ();
         InputStream input = new FileInputStream(new File(configFile));
         Yaml yaml = new Yaml();
@@ -149,7 +149,7 @@ public class ReadYaml {
         }
     }
 
-    private void setTimeLine(Map item) throws ParseException {
+    private void setTimeLine(Map item) {
         timeLine timeline = new timeLine();
         String value = "";
         if (item.get("countrycode") != null) {

@@ -2,11 +2,13 @@ package stepDefinitions;
 
 import EXIFFile.OpenStreetMapUtils;
 import EXIFFile.ReadEXIF;
+import EXIFFile.ReadYaml;
 import EXIFFile.WriteEXIF;
 import com.drew.imaging.ImageProcessingException;
 import io.cucumber.java.en.*;
 import org.junit.Assert;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +24,8 @@ public class stepDefinitions {
     Map<String, String> address;
     Double latitude;
     Double longitude;
+    ReadYaml readYaml;
+    ReadYaml.timeLine element;
 
     @Given("File {string}")
     public void file(String mediaFile) throws ImageProcessingException, IOException {
@@ -151,4 +155,47 @@ public class stepDefinitions {
             writeEXIF.WriteFile();
         }
     }
+
+    @Given("configuration file {string}")
+    public void configurationFile(String configFile) throws FileNotFoundException {
+        this.readYaml = new ReadYaml("Z:\\workspace\\resources\\" + configFile);
+    }
+
+    @Then("number of timelines should be {int}")
+    public void numberOfTimelinesShouldBe(int count) {
+        Assert.assertEquals(count, this.readYaml.getTimeLines().size());
+    }
+
+    @When("get element {int}")
+    public void getElement(int index) {
+        this.element = this.readYaml.getTimeLines().get(index-1);
+    }
+
+    @Then("copyright should be {string}")
+    public void copyrightShouldBe(String copyright) {
+        Assert.assertEquals(copyright, element.getCopyright());
+    }
+
+    @And("country should be {string}")
+    public void countryShouldBe(String country) {
+        Assert.assertEquals(country, element.getCountry());
+    }
+
+    @And("startdate should be {string}")
+    public void startdateShouldBe(String date) {
+        String compareDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.element.getStartdate());
+        Assert.assertEquals(date, compareDate);
+    }
+
+    @And("enddate should be {string}")
+    public void enddateShouldBe(String date) {
+        String compareDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.element.getEnddate());
+        Assert.assertEquals(date, compareDate);
+    }
+
+    @And("description should be {string}")
+    public void descriptionShouldBe(String description) {
+        Assert.assertEquals(description, this.element.getDescription());
+    }
+
 }
