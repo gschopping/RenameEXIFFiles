@@ -16,7 +16,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class stepDefinitions {
     String mediaFile;
@@ -157,7 +159,7 @@ public class stepDefinitions {
     }
 
     @Given("configuration file {string}")
-    public void configurationFile(String configFile) throws FileNotFoundException {
+    public void configurationFile(String configFile) throws FileNotFoundException, ParseException {
         this.readYaml = new ReadYaml("Z:\\workspace\\resources\\" + configFile);
     }
 
@@ -184,6 +186,9 @@ public class stepDefinitions {
     @And("startdate should be {string}")
     public void startdateShouldBe(String date) {
         String compareDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.element.getStartdate());
+//        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//        Date compareDate = isoFormat.parse(date);
         Assert.assertEquals(date, compareDate);
     }
 

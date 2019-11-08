@@ -2,6 +2,7 @@ package main;
 
 import EXIFFile.ReadAddress;
 import EXIFFile.ReadYaml;
+import org.checkerframework.checker.units.qual.Time;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -12,9 +13,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class main {
 
@@ -70,6 +73,7 @@ public class main {
     }
 
     public static void main(String[] args) throws IOException, ParseException {
+
 
         ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\start.yml");
         for (ReadYaml.timeLine timeLine : readYaml.getTimeLines()) {

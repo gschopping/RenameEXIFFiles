@@ -10,5 +10,5 @@ Feature: read Yaml file
     Then copyright should be "Guido Schöpping (2019)"
     And country should be "België"
     And description should be "Wandeling langs de Lienne"
-    And startdate should be "2019-03-22 12:00:00"
-    And enddate should be "2019-03-24 12:00:00"
+    And startdate should be "2019-03-22 11:00:00"
+    And enddate should be "2019-03-24 11:00:00"

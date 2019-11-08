@@ -1,5 +1,6 @@
 package EXIFFile;
 
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
@@ -9,6 +10,10 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class ReadYaml {
@@ -74,12 +79,14 @@ public class ReadYaml {
             return copyright;
         }
 
-        public void setStartdate(Date startdate) {
-            this.startdate = startdate;
+        public void setStartdate(String startdate) throws ParseException {
+            this.startdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startdate);
         }
 
         public void setEnddate(Date enddate) {
+
             this.enddate = enddate;
+            ;
         }
 
         public void setTitle(String title) {
@@ -136,9 +143,13 @@ public class ReadYaml {
 
     }
 
-    public ReadYaml(String configFile) throws FileNotFoundException {
+    public ReadYaml(String configFile) throws FileNotFoundException, ParseException {
         this.timeLines = new ArrayList<timeLine> ();
         InputStream input = new FileInputStream(new File(configFile));
+//        DumperOptions options = new DumperOptions();
+//        options.setTimeZone(TimeZone.getTimeZone("UTC+5:00"));
+//        Yaml yaml = new Yaml(options);
+        TimeZone.getTimeZone("GMT");
         Yaml yaml = new Yaml();
         Map timeLine = yaml.load(input);
         if (timeLine.get("timeline") != null) {
@@ -149,7 +160,7 @@ public class ReadYaml {
         }
     }
 
-    private void setTimeLine(Map item) {
+    private void setTimeLine(Map item) throws ParseException {
         timeLine timeline = new timeLine();
         String value = "";
         if (item.get("countrycode") != null) {
@@ -181,8 +192,8 @@ public class ReadYaml {
             timeline.setCopyRight(value);
         }
         if (item.get("startdate") != null) {
-            Date date = (Date) item.get("startdate");
-            timeline.setStartdate(date);
+            value = (String) item.get("startdate");
+            timeline.setStartdate(value);
         }
         if (item.get("title") != null) {
             value = (String) item.get("title");
