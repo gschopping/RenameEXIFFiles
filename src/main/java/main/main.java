@@ -74,6 +74,9 @@ public class main {
 
     public static void main(String[] args) {
 
+        Locale obj = new Locale("", "BE");
+        System.out.println(obj.getDisplayCountry());
+
 
 
         ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\invalid_variable.yml");

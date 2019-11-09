@@ -53,7 +53,12 @@ public class ReadYaml {
         }
 
         public String getCountry() {
-            return country;
+            if ((this.country == null) && (this.countrycode != null)) {
+                Locale obj = new Locale("", this.countrycode);
+                return obj.getDisplayCountry();
+            } else {
+                return country;
+            }
         }
 
         public String getProvince() {
