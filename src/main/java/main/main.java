@@ -75,7 +75,10 @@ public class main {
     public static void main(String[] args) throws IOException, ParseException {
 
 
-        ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\start.yml");
+        ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\incorrect_date.yml");
+        for (String errorMessage : readYaml.getErrorMessages()) {
+            System.out.println(errorMessage);
+        }
         for (ReadYaml.timeLine timeLine : readYaml.getTimeLines()) {
             System.out.println(timeLine.getStartdate() +  "  ==> " + timeLine.getEnddate());
             System.out.println(timeLine.getDescription());

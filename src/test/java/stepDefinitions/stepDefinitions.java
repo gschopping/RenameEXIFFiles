@@ -6,6 +6,7 @@ import EXIFFile.ReadYaml;
 import EXIFFile.WriteEXIF;
 import com.drew.imaging.ImageProcessingException;
 import io.cucumber.java.en.*;
+import junit.framework.AssertionFailedError;
 import org.junit.Assert;
 
 import java.io.FileNotFoundException;
@@ -19,6 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
+
+import static org.hamcrest.Matchers.matchesPattern;
 
 public class stepDefinitions {
     String mediaFile;
@@ -203,4 +206,9 @@ public class stepDefinitions {
         Assert.assertEquals(description, this.element.getDescription());
     }
 
+    @Then("an error {string} should be shown")
+    public void anErrorShouldBeShown(String errorMessage) {
+        Assert.assertEquals(errorMessage, this.readYaml.getErrorMessages().get(0));
+        Assert.assertThat(this.readYaml.getErrorMessages().get(0), matchesPattern(errorMessage));
+    }
 }

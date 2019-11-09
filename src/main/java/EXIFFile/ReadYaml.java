@@ -15,9 +15,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ReadYaml {
+    final String regexParser = "line (\\d+), column (\\d+):\n^(\\s*)(.+)$";
+    final String regexDateParser = "^Unparseable date: \"(.+)\"$";
     private List<timeLine> timeLines;
+    private List<String> errorMessages;
 
     public class timeLine {
         private Date startdate;
@@ -143,19 +148,48 @@ public class ReadYaml {
 
     }
 
-    public ReadYaml(String configFile) throws FileNotFoundException, ParseException {
+    public ReadYaml(String configFile) {
+        this.errorMessages = new ArrayList<String>();
         this.timeLines = new ArrayList<timeLine> ();
-        InputStream input = new FileInputStream(new File(configFile));
-//        DumperOptions options = new DumperOptions();
-//        options.setTimeZone(TimeZone.getTimeZone("UTC+5:00"));
-//        Yaml yaml = new Yaml(options);
-        TimeZone.getTimeZone("GMT");
-        Yaml yaml = new Yaml();
-        Map timeLine = yaml.load(input);
-        if (timeLine.get("timeline") != null) {
-            ArrayList<Map> timelineArray = (ArrayList<Map>) timeLine.get("timeline");
-            for (Map timelineItem : timelineArray) {
-                setTimeLine(timelineItem);
+        int lineCount = 0;
+        try {
+            InputStream input = new FileInputStream(new File(configFile));
+            Yaml yaml = new Yaml();
+            Map timeLine = yaml.load(input);
+            if (timeLine.get("timeline") != null) {
+                ArrayList<Map> timelineArray = (ArrayList<Map>) timeLine.get("timeline");
+                for (Map timelineItem : timelineArray) {
+                    lineCount++;
+                    setTimeLine(timelineItem);
+                }
+            }
+        }
+        catch (Exception e) {
+            String errorType = e.getClass().getName();
+            if (errorType.equals("org.yaml.snakeyaml.parser.ParserException")) {
+                Pattern pattern = Pattern.compile(regexParser, Pattern.MULTILINE);
+                Matcher matcher = pattern.matcher(e.getMessage());
+                int line = 0;
+                int column = 0;
+                String sentence = "";
+                if (matcher.find()) {
+                    line = Integer.parseInt(matcher.group(1));
+                    column = Integer.parseInt(matcher.group(2));
+                    sentence = matcher.group(4);
+                }
+                this.errorMessages.add(String.format("Error on line %d, column %d: %s", line, column, sentence));
+            }
+            else if (errorType.equals("java.io.FileNotFoundException")) {
+                this.errorMessages.add(String.format("%s not found",configFile));
+            }
+            else if (errorType.equals("java.text.ParseException")) {
+                Pattern pattern = Pattern.compile(regexDateParser);
+                Matcher matcher = pattern.matcher(e.getMessage());
+                String sentence = "";
+                if (matcher.find()) {
+                    sentence = matcher.group(1);
+                }
+                this.errorMessages.add(String.format("Error in timeline %d, incorrect dateformat: %s", lineCount, sentence));
             }
         }
     }
@@ -224,6 +258,10 @@ public class ReadYaml {
         Collections.sort(this.timeLines, new SortbyDate());
         setEnddate();
         return this.timeLines;
+    }
+
+    public List<String> getErrorMessages() {
+        return this.errorMessages;
     }
 
 }

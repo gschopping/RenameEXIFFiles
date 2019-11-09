@@ -12,3 +12,23 @@ Feature: read Yaml file
     And description should be "Wandeling langs de Lienne"
     And startdate should be "2019-03-22 11:00:00"
     And enddate should be "2019-03-24 11:00:00"
+
+  Scenario: faulty yaml file
+    Given configuration file "not_a_yaml.yml"
+    Then an error "Error on line 11, column 5: -startdate: \"2019-04-13 10:00:00\"" should be shown
+    
+  Scenario: incorrect date format
+    Given configuration file "incorrect_date.yml"
+    Then an error "Error in timeline 1, incorrect dateformat: 2019-04 10:00:00" should be shown
+    
+  Scenario: 2 timelines with same startdate
+    Given configuration file "same_startdate.yml"
+    Then an error "Error" should be shown
+    
+  Scenario: incorrect countrycode is used
+    Given configuration file "incorrect_countrycode.ym;"
+    Then an error "Error" should be shown
+
+  Scenario: invalid variable is used
+    Given configuration file "invalid_variable.yml"
+    Then an error "Error" should be shown
