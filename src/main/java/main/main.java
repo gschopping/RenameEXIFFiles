@@ -72,10 +72,10 @@ public class main {
 
     }
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) {
 
 
-        ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\incorrect_date.yml");
+        ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\start.yml");
         for (String errorMessage : readYaml.getErrorMessages()) {
             System.out.println(errorMessage);
         }

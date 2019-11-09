@@ -166,6 +166,7 @@ public class ReadYaml {
         }
         catch (Exception e) {
             String errorType = e.getClass().getName();
+//            System.out.println(errorType);
             if (errorType.equals("org.yaml.snakeyaml.parser.ParserException")) {
                 Pattern pattern = Pattern.compile(regexParser, Pattern.MULTILINE);
                 Matcher matcher = pattern.matcher(e.getMessage());
@@ -191,10 +192,13 @@ public class ReadYaml {
                 }
                 this.errorMessages.add(String.format("Error in timeline %d, incorrect dateformat: %s", lineCount, sentence));
             }
+            else if (errorType.equals("java.lang.Exception")) {
+                this.errorMessages.add(String.format("Error in timeline %d, %s", lineCount, e.getMessage()));
+            }
         }
     }
 
-    private void setTimeLine(Map item) throws ParseException {
+    private void setTimeLine(Map item) throws Exception {
         timeLine timeline = new timeLine();
         String value = "";
         if (item.get("countrycode") != null) {
@@ -241,7 +245,16 @@ public class ReadYaml {
             value = (String) item.get("description");
             timeline.setDescription(value);
         }
-        timeLines.add(timeline);
+        addTimeline(timeline);
+    }
+
+    private void addTimeline(timeLine timeline) throws Exception {
+        for (timeLine element : this.timeLines) {
+            if (timeline.getStartdate().equals(element.getStartdate())) {
+                throw new Exception(String.format("startdate: %tF %tT already exists", timeline.getStartdate(), timeline.getStartdate()));
+            }
+        }
+        this.timeLines.add(timeline);
     }
 
     private void setEnddate() {

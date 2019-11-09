@@ -22,8 +22,8 @@ Feature: read Yaml file
     Then an error "Error in timeline 1, incorrect dateformat: 2019-04 10:00:00" should be shown
     
   Scenario: 2 timelines with same startdate
-    Given configuration file "same_startdate.yml"
-    Then an error "Error" should be shown
+    Given configuration file "same_date.yml"
+    Then an error "Error in timeline 2, startdate: 2019-04-05 10:00:00 already exists" should be shown
     
   Scenario: incorrect countrycode is used
     Given configuration file "incorrect_countrycode.ym;"
