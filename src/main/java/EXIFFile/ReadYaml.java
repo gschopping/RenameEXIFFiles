@@ -98,13 +98,15 @@ public class ReadYaml {
             this.title = title;
         }
 
-        public void setCountrycode(String countrycode) {
+        public void setCountrycode(String countrycode) throws Exception {
             Locale obj = new Locale("", countrycode);
-            if (obj != null) {
-                this.countrycode = obj.getCountry();
-            } else {
-                this.countrycode = "";
+            try {
+                String code = obj.getISO3Country();
             }
+            catch (Exception e){
+                throw new Exception(String.format("countrycode: %s is not valid", countrycode));
+            }
+            this.countrycode = obj.getCountry();
         }
 
         public void setCountry(String country) {
@@ -194,6 +196,19 @@ public class ReadYaml {
             }
             else if (errorType.equals("java.lang.Exception")) {
                 this.errorMessages.add(String.format("Error in timeline %d, %s", lineCount, e.getMessage()));
+            }
+            else if (errorType.equals("org.yaml.snakeyaml.composer.ComposerException")) {
+                Pattern pattern = Pattern.compile(regexParser, Pattern.MULTILINE);
+                Matcher matcher = pattern.matcher(e.getMessage());
+                int line = 0;
+                int column = 0;
+                String sentence = "";
+                if (matcher.find()) {
+                    line = Integer.parseInt(matcher.group(1));
+                    column = Integer.parseInt(matcher.group(2));
+                    sentence = matcher.group(4);
+                }
+                this.errorMessages.add(String.format("Error on line %d, column %d: undefined alias %s", line, column, sentence));
             }
         }
     }

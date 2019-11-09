@@ -209,6 +209,6 @@ public class stepDefinitions {
     @Then("an error {string} should be shown")
     public void anErrorShouldBeShown(String errorMessage) {
         Assert.assertEquals(errorMessage, this.readYaml.getErrorMessages().get(0));
-        Assert.assertThat(this.readYaml.getErrorMessages().get(0), matchesPattern(errorMessage));
+//        Assert.assertThat(this.readYaml.getErrorMessages().get(0), matchesPattern(errorMessage));
     }
 }

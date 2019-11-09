@@ -26,9 +26,9 @@ Feature: read Yaml file
     Then an error "Error in timeline 2, startdate: 2019-04-05 10:00:00 already exists" should be shown
     
   Scenario: incorrect countrycode is used
-    Given configuration file "incorrect_countrycode.ym;"
-    Then an error "Error" should be shown
+    Given configuration file "invalid_countrycode.yml"
+    Then an error "Error in timeline 3, countrycode: BX is not valid" should be shown
 
   Scenario: invalid variable is used
     Given configuration file "invalid_variable.yml"
-    Then an error "Error" should be shown
+    Then an error "Error on line 13, column 11: undefined alias <<: *default" should be shown

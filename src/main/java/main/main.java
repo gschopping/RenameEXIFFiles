@@ -75,7 +75,8 @@ public class main {
     public static void main(String[] args) {
 
 
-        ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\start.yml");
+
+        ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\invalid_variable.yml");
         for (String errorMessage : readYaml.getErrorMessages()) {
             System.out.println(errorMessage);
         }
@@ -83,6 +84,7 @@ public class main {
             System.out.println(timeLine.getStartdate() +  "  ==> " + timeLine.getEnddate());
             System.out.println(timeLine.getDescription());
             System.out.println(timeLine.getCountry());
+            System.out.println(timeLine.getCountrycode());
         }
 
     }
