@@ -7,17 +7,21 @@ import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class main {
 
@@ -72,23 +76,47 @@ public class main {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        final String regexMedia = "^(.*\\.MP4|.*\\.ARW|.*\\.JPG|.*\\.DNG|.*\\.M2TS)$";
+//        final String regexMedia = "(.*)";
+        String path = "Z:\\workspace\\resources";
 
-        Locale obj = new Locale("", "BE");
-        System.out.println(obj.getDisplayCountry());
+//        Files.find(Paths.get(path),
+//                Integer.MAX_VALUE,
+//                (filePath, fileAttr) -> fileAttr.isRegularFile())
+//                .forEach(System.out::println);
 
+        File dir = new File(path);
+        File [] files = dir.listFiles();
 
+        Arrays.sort( files, (Comparator) (o1, o2) -> {
 
-        ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\invalid_variable.yml");
-        for (String errorMessage : readYaml.getErrorMessages()) {
-            System.out.println(errorMessage);
+            if (((File)o1).lastModified() > ((File)o2).lastModified()) {
+                return +1;
+            } else if (((File)o1).lastModified() < ((File)o2).lastModified()) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+
+        for (File child : files) {
+            if (child.getName().toUpperCase().matches(regexMedia)) {
+                System.out.println(child.getName());
+            }
         }
-        for (ReadYaml.timeLine timeLine : readYaml.getTimeLines()) {
-            System.out.println(timeLine.getStartdate() +  "  ==> " + timeLine.getEnddate());
-            System.out.println(timeLine.getDescription());
-            System.out.println(timeLine.getCountry());
-            System.out.println(timeLine.getCountrycode());
-        }
+
+
+//        ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\invalid_variable.yml");
+//        for (String errorMessage : readYaml.getErrorMessages()) {
+//            System.out.println(errorMessage);
+//        }
+//        for (ReadYaml.timeLine timeLine : readYaml.getTimeLines()) {
+//            System.out.println(timeLine.getStartdate() +  "  ==> " + timeLine.getEnddate());
+//            System.out.println(timeLine.getDescription());
+//            System.out.println(timeLine.getCountry());
+//            System.out.println(timeLine.getCountrycode());
+//        }
 
     }
 

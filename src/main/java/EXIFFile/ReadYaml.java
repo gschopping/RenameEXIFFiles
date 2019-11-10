@@ -215,6 +215,9 @@ public class ReadYaml {
                 }
                 this.errorMessages.add(String.format("Error on line %d, column %d: undefined alias %s", line, column, sentence));
             }
+            else {
+                this.errorMessages.add(e.getMessage());
+            }
         }
     }
 
