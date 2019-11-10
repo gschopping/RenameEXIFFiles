@@ -1,23 +1,21 @@
 package EXIFFile;
 
-import java.io.BufferedReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class WriteEXIF {
     private String mediaFile;
+    private String copyFile;
     private String fileType;
     private List<String> arguments;
 
-    public WriteEXIF(String mediaFile) throws IOException {
+    public WriteEXIF(String mediaFile, String writeFile) throws IOException {
         this.mediaFile = mediaFile;
+        this.copyFile = writeFile;
         this.fileType = this.GetFileType();
         this.arguments = new ArrayList<String>();
-        this.arguments.add("-overwrite_original");
     }
 
 
@@ -63,18 +61,26 @@ public class WriteEXIF {
             String result;
             String tempdir =  System.getProperty("java.io.tmpdir");
             writeArguments();
-            Process process = Runtime.getRuntime().exec("exiftool.bat -charset IPTC=UTF8 -@ " + tempdir + "arguments.txt " + this.mediaFile);
+            // Before copting first delete original file
+            try {
+                File file = new File(this.copyFile);
+                if (! file.delete()) {
+                    throw new IOException("Can't delete file " + this.copyFile);
+                }
+            }
+            catch (Exception e) {
+            }
+            Process process = Runtime.getRuntime().exec("exiftool.bat -charset IPTC=UTF8 -@ " + tempdir + "arguments.txt " + this.mediaFile + " -o " + this.copyFile);
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             result = reader.readLine();
             if (result != null) {
-                if (! result.matches("\\s*1 image files updated")) {
+                if (! result.matches("\\s*1 image files created")) {
                     throw new IOException("Update of file " + this.mediaFile + " failed");
                 }
             }
             reader.close();
             // set to inital value in case you want to write new tags to the same file
             this.arguments.clear();
-            this.arguments.add("-overwrite_original");
         }
     }
 

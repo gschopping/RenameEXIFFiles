@@ -11,7 +11,7 @@ Feature: Read GPS tags and get address
 
   Scenario: Read GPS from Sony RAW file and writes found address information
     Given File "SonyA77.ARW"
-    When read GPS tags and write address information
+    When read GPS tags and write address information to file "results\SonyA77.ARW"
     Then tag "XMP:City" should contain "Schouwen-Duiveland"
     And tag "XMP:CountryCode" should contain "NL"
     And tag "IPTC:Country-PrimaryLocationCode" should contain "NLD"

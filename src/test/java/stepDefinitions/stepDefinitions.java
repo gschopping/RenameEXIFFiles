@@ -23,15 +23,18 @@ import java.util.TimeZone;
 import static org.hamcrest.Matchers.matchesPattern;
 
 public class stepDefinitions {
-    String mediaFile;
-    ReadEXIF readEXIF;
-    Map<String, String> address;
-    Double latitude;
-    Double longitude;
-    ReadYaml readYaml;
-    ReadYaml.timeLine element;
-    ReadFiles readFiles;
-    List<File> files;
+    private String mediaFile;
+    private String copyFile;
+    private ReadEXIF readEXIF;
+    private Map<String, String> address;
+    private Double latitude;
+    private Double longitude;
+    private ReadYaml readYaml;
+    private ReadYaml.timeLine element;
+    private ReadFiles readFiles;
+    private List<File> files;
+
+    // CreateDate feature =========================================================
 
     @Given("File {string}")
     public void file(String mediaFile) throws ImageProcessingException, IOException {
@@ -45,33 +48,33 @@ public class stepDefinitions {
         Assert.assertEquals(creationDate, compareDate);
     }
 
-    @Given("file to write {string}")
-    public void fileToWrite(String mediaFile) throws IOException {
-        this.mediaFile = mediaFile;
-        // copy file from original destination in order to get clean exif values
-        Path source = Paths.get("Z:\\workspace\\resources\\" + mediaFile);
-        Path destination = Paths.get("Z:\\workspace\\resources\\results\\" + mediaFile);
-        Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+    // WriteTags feature =========================================================
+
+    @Given("file to read {string} and write {string}")
+    public void fileToReadAndWrite(String readFile, String writeFile) {
+        this.mediaFile = readFile;
+        this.copyFile = writeFile;
     }
+
 
     @When("write Author {string}")
     public void writeAuthor(String author) throws IOException {
-        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\results\\" + this.mediaFile);
+        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
         writeEXIF.SetAuthor(author);
         writeEXIF.WriteFile();
     }
 
     @Then("tag {string} should contain {string}")
-    public void tagShouldContain(String tag, String author) throws IOException {
-        ReadEXIF readEXIF = new ReadEXIF("Z:\\workspace\\resources\\results\\" + this.mediaFile);
+    public void tagShouldContain(String tag, String value) throws IOException {
+        ReadEXIF readEXIF = new ReadEXIF("Z:\\workspace\\resources\\" + this.copyFile);
         String result = readEXIF.GetTag(tag);
-        Assert.assertEquals(author, result);
+        Assert.assertEquals(value, result);
 
     }
 
     @When("write Title {string}")
     public void writeTitle(String title) throws IOException {
-        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\results\\" + this.mediaFile);
+        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
         writeEXIF.SetTitle(title);
         writeEXIF.WriteFile();
     }
@@ -79,24 +82,26 @@ public class stepDefinitions {
     @When("write Keys {string}")
     public void writeKeys(String keys) throws IOException {
         String[] results = keys.split(",");
-        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\results\\" + this.mediaFile);
+        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
         writeEXIF.SetKeys(results);
         writeEXIF.WriteFile();
     }
 
     @When("write Country {string}")
     public void writeCountry(String country) throws IOException {
-        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\results\\" + this.mediaFile);
+        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
         writeEXIF.SetCountry(country);
         writeEXIF.WriteFile();
     }
 
     @When("write City {string}")
     public void writeCity(String city) throws IOException {
-        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\results\\" + this.mediaFile);
+        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
         writeEXIF.SetCity(city);
         writeEXIF.WriteFile();
     }
+
+    // GPS Tags feature =========================================================
 
     @Then("latitude should be {string}")
     public void latitudeShouldBe(String latitude) throws IOException {
@@ -142,17 +147,13 @@ public class stepDefinitions {
         this.address = OpenStreetMapUtils.getInstance().getAddress(this.latitude, this.longitude);
     }
 
-    @When("read GPS tags and write address information")
-    public void readGPSTagsAndWriteAddressInformation() throws IOException {
+    @When("read GPS tags and write address information to file {string}")
+    public void readGPSTagsAndWriteAddressInformationToFile(String writeFile) throws IOException {
         this.longitude = readEXIF.GetGPSLongitude();
         this.latitude = readEXIF.GetGPSLatitude();
         this.address = OpenStreetMapUtils.getInstance().getAddress(this.latitude, this.longitude);
         if (this.address != null) {
-            // copy file from original destination in order to get clean exif values
-            Path source = Paths.get("Z:\\workspace\\resources\\" + mediaFile);
-            Path destination = Paths.get("Z:\\workspace\\resources\\results\\" + mediaFile);
-            Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
-            WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\results\\" + this.mediaFile);
+            WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + writeFile);
             writeEXIF.SetCountryCode(this.address.get("countrycode"));
             writeEXIF.SetCountry(this.address.get("country"));
             writeEXIF.SetCity(this.address.get("city"));
@@ -161,6 +162,8 @@ public class stepDefinitions {
             writeEXIF.WriteFile();
         }
     }
+
+    // Read Yaml feature =========================================================
 
     @Given("configuration file {string}")
     public void configurationFile(String configFile) throws FileNotFoundException, ParseException {
@@ -213,6 +216,8 @@ public class stepDefinitions {
 //        Assert.assertThat(this.readYaml.getErrorMessages().get(0), matchesPattern(errorMessage));
     }
 
+    // Directory feature =========================================================
+
     @Given("directory {string}")
     public void directory(String directory) {
         this.readFiles = new ReadFiles(directory);
@@ -247,4 +252,5 @@ public class stepDefinitions {
     public void theNumberOfDirectoriesShouldBe(int count) {
         Assert.assertEquals(count, this.files.size());
     }
+
 }
