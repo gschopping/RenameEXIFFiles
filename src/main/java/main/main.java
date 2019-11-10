@@ -79,8 +79,20 @@ public class main {
 
     public static void main(String[] args) throws IOException {
 
-        ReadFiles files = new ReadFiles("Z:\\workspace\\resources");
-        for (File child : files.ReadFromDirectory()) {
+        ReadFiles files = new ReadFiles("X:\\Onbewerkt");
+        for (File child : files.getFilesFromDirectory()) {
+            System.out.println(child.getName());
+        }
+
+        System.out.println("======== Timelaps directories ==================");
+
+        for (File child : files.getTimelapsDirectories()) {
+            System.out.println(child.getName());
+        }
+
+        System.out.println("========== Files in Timelaps1 ==================");
+
+        for (File child : files.getTimelapsFiles(files.getTimelapsDirectories().get(0))) {
             System.out.println(child.getName());
         }
 

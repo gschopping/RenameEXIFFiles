@@ -220,7 +220,7 @@ public class stepDefinitions {
 
     @When("read all media files")
     public void readAllMediaFiles() {
-        this.files = this.readFiles.ReadFromDirectory();
+        this.files = this.readFiles.getFilesFromDirectory();
     }
 
     @Then("the number of files should be {int}")
@@ -236,5 +236,15 @@ public class stepDefinitions {
     @And("the last file should be {string}")
     public void theLastFileShouldBe(String fileName) {
         Assert.assertEquals(fileName, this.files.get(this.files.size()-1).getName());
+    }
+
+    @When("read Timelaps subdirectories")
+    public void readTimelapsSubdirectories() {
+        this.files = this.readFiles.getTimelapsDirectories();
+    }
+
+    @Then("the number of directories should be {int}")
+    public void theNumberOfDirectoriesShouldBe(int count) {
+        Assert.assertEquals(count, this.files.size());
     }
 }
