@@ -1,6 +1,7 @@
 package main;
 
 import EXIFFile.ReadAddress;
+import EXIFFile.ReadFiles;
 import EXIFFile.ReadYaml;
 import org.checkerframework.checker.units.qual.Time;
 import org.yaml.snakeyaml.TypeDescription;
@@ -77,35 +78,11 @@ public class main {
     }
 
     public static void main(String[] args) throws IOException {
-        final String regexMedia = "^(.*\\.MP4|.*\\.ARW|.*\\.JPG|.*\\.DNG|.*\\.M2TS)$";
-//        final String regexMedia = "(.*)";
-        String path = "Z:\\workspace\\resources";
 
-//        Files.find(Paths.get(path),
-//                Integer.MAX_VALUE,
-//                (filePath, fileAttr) -> fileAttr.isRegularFile())
-//                .forEach(System.out::println);
-
-        File dir = new File(path);
-        File [] files = dir.listFiles();
-
-        Arrays.sort( files, (Comparator) (o1, o2) -> {
-
-            if (((File)o1).lastModified() > ((File)o2).lastModified()) {
-                return +1;
-            } else if (((File)o1).lastModified() < ((File)o2).lastModified()) {
-                return -1;
-            } else {
-                return 0;
-            }
-        });
-
-        for (File child : files) {
-            if (child.getName().toUpperCase().matches(regexMedia)) {
-                System.out.println(child.getName());
-            }
+        ReadFiles files = new ReadFiles("Z:\\workspace\\resources");
+        for (File child : files.ReadFromDirectory()) {
+            System.out.println(child.getName());
         }
-
 
 //        ReadYaml readYaml = new ReadYaml("Z:\\workspace\\resources\\invalid_variable.yml");
 //        for (String errorMessage : readYaml.getErrorMessages()) {

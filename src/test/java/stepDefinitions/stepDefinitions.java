@@ -1,14 +1,12 @@
 package stepDefinitions;
 
-import EXIFFile.OpenStreetMapUtils;
-import EXIFFile.ReadEXIF;
-import EXIFFile.ReadYaml;
-import EXIFFile.WriteEXIF;
+import EXIFFile.*;
 import com.drew.imaging.ImageProcessingException;
 import io.cucumber.java.en.*;
 import junit.framework.AssertionFailedError;
 import org.junit.Assert;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,6 +16,7 @@ import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -31,6 +30,8 @@ public class stepDefinitions {
     Double longitude;
     ReadYaml readYaml;
     ReadYaml.timeLine element;
+    ReadFiles readFiles;
+    List<File> files;
 
     @Given("File {string}")
     public void file(String mediaFile) throws ImageProcessingException, IOException {
@@ -210,5 +211,30 @@ public class stepDefinitions {
     public void anErrorShouldBeShown(String errorMessage) {
         Assert.assertEquals(errorMessage, this.readYaml.getErrorMessages().get(0));
 //        Assert.assertThat(this.readYaml.getErrorMessages().get(0), matchesPattern(errorMessage));
+    }
+
+    @Given("directory {string}")
+    public void directory(String directory) {
+        this.readFiles = new ReadFiles(directory);
+    }
+
+    @When("read all media files")
+    public void readAllMediaFiles() {
+        this.files = this.readFiles.ReadFromDirectory();
+    }
+
+    @Then("the number of files should be {int}")
+    public void theNumberOfFilesShouldBe(int count) {
+        Assert.assertEquals(count, this.files.size());
+    }
+
+    @And("the first file should be {string}")
+    public void theFirstFileShouldBe(String fileName) {
+        Assert.assertEquals(fileName, this.files.get(0).getName());
+    }
+
+    @And("the last file should be {string}")
+    public void theLastFileShouldBe(String fileName) {
+        Assert.assertEquals(fileName, this.files.get(this.files.size()-1).getName());
     }
 }
