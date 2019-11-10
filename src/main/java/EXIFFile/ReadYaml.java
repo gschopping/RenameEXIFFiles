@@ -1,28 +1,21 @@
 package EXIFFile;
 
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReadYaml {
-    final String regexParser = "line (\\d+), column (\\d+):\n^(\\s*)(.+)$";
-    final String regexDateParser = "^Unparseable date: \"(.+)\"$";
+    private final String regexParser = "line (\\d+), column (\\d+):\n^(\\s*)(.+)$";
+    private final String regexDateParser = "^Unparseable date: \"(.+)\"$";
     private List<timeLine> timeLines;
-    private List<String> errorMessages;
+//    private List<String> errorMessages;
 
     public class timeLine {
         private Date startdate;
@@ -155,8 +148,8 @@ public class ReadYaml {
 
     }
 
-    public ReadYaml(String configFile) {
-        this.errorMessages = new ArrayList<String>();
+    public ReadYaml(String configFile) throws Exception {
+//        this.errorMessages = new ArrayList<String>();
         this.timeLines = new ArrayList<timeLine> ();
         int lineCount = 0;
         try {
@@ -173,7 +166,6 @@ public class ReadYaml {
         }
         catch (Exception e) {
             String errorType = e.getClass().getName();
-//            System.out.println(errorType);
             if (errorType.equals("org.yaml.snakeyaml.parser.ParserException")) {
                 Pattern pattern = Pattern.compile(regexParser, Pattern.MULTILINE);
                 Matcher matcher = pattern.matcher(e.getMessage());
@@ -185,10 +177,12 @@ public class ReadYaml {
                     column = Integer.parseInt(matcher.group(2));
                     sentence = matcher.group(4);
                 }
-                this.errorMessages.add(String.format("Error on line %d, column %d: %s", line, column, sentence));
+//                this.errorMessages.add(String.format("Error on line %d, column %d: %s", line, column, sentence));
+                throw new Exception(String.format("Error on line %d, column %d: %s", line, column, sentence));
             }
             else if (errorType.equals("java.io.FileNotFoundException")) {
-                this.errorMessages.add(String.format("%s not found",configFile));
+//                this.errorMessages.add(String.format("%s not found",configFile));
+                throw new Exception(String.format("%s not found",configFile));
             }
             else if (errorType.equals("java.text.ParseException")) {
                 Pattern pattern = Pattern.compile(regexDateParser);
@@ -197,10 +191,12 @@ public class ReadYaml {
                 if (matcher.find()) {
                     sentence = matcher.group(1);
                 }
-                this.errorMessages.add(String.format("Error in timeline %d, incorrect dateformat: %s", lineCount, sentence));
+//                this.errorMessages.add(String.format("Error in timeline %d, incorrect dateformat: %s", lineCount, sentence));
+                throw new Exception(String.format("Error in timeline %d, incorrect dateformat: %s", lineCount, sentence));
             }
             else if (errorType.equals("java.lang.Exception")) {
-                this.errorMessages.add(String.format("Error in timeline %d, %s", lineCount, e.getMessage()));
+//                this.errorMessages.add(String.format("Error in timeline %d, %s", lineCount, e.getMessage()));
+                throw new Exception(String.format("Error in timeline %d, %s", lineCount, e.getMessage()));
             }
             else if (errorType.equals("org.yaml.snakeyaml.composer.ComposerException")) {
                 Pattern pattern = Pattern.compile(regexParser, Pattern.MULTILINE);
@@ -213,10 +209,12 @@ public class ReadYaml {
                     column = Integer.parseInt(matcher.group(2));
                     sentence = matcher.group(4);
                 }
-                this.errorMessages.add(String.format("Error on line %d, column %d: undefined alias %s", line, column, sentence));
+//                this.errorMessages.add(String.format("Error on line %d, column %d: undefined alias %s", line, column, sentence));
+                throw new Exception(String.format("Error on line %d, column %d: undefined alias %s", line, column, sentence));
             }
             else {
-                this.errorMessages.add(e.getMessage());
+//                this.errorMessages.add(e.getMessage());
+                throw new Exception(e.getMessage());
             }
         }
     }
@@ -296,8 +294,8 @@ public class ReadYaml {
         return this.timeLines;
     }
 
-    public List<String> getErrorMessages() {
-        return this.errorMessages;
-    }
+//    public List<String> getErrorMessages() {
+//        return this.errorMessages;
+//    }
 
 }

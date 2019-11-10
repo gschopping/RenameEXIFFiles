@@ -80,21 +80,9 @@ public class OpenStreetMapUtils {
 
         // don't request api for testcases in order to avoid blocking of the site
         if (latitude.equals(51.454183) && longitude.equals(3.653545)) {
-            queryResult = "";
-//            And street should be "Rammekensweg"
-//            And location should be "Ritthem"
-//            And city should be "Vlissingen"
+            queryResult = "{\"place_id\":261870388,\"licence\":\"Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright\",\"osm_type\":\"way\",\"osm_id\":168908204,\"lat\":\"51.4541747279983\",\"lon\":\"3.65353658637693\",\"display_name\":\"Rammekensweg, Ritthem, Vlissingen, Zeeland, Nederland, 4389TZ, Nederland\",\"address\":{\"footway\":\"Rammekensweg\",\"suburb\":\"Ritthem\",\"town\":\"Vlissingen\",\"state\":\"Zeeland\",\"postcode\":\"4389TZ\",\"country\":\"Nederland\",\"country_code\":\"nl\"},\"boundingbox\":[\"51.4528958\",\"51.4549397\",\"3.6533426\",\"3.6540872\"]}";
         } else if (latitude.equals(51.679494) && longitude.equals(4.138041)) {
-            queryResult = "";
-//            Then tag "XMP:City" should contain "Schouwen-Duiveland"
-//            And tag "XMP:CountryCode" should contain "NL"
-//            And tag "IPTC:Country-PrimaryLocationCode" should contain "NLD"
-//            And tag "XMP:Country" should contain "Nederland"
-//            And tag "IPTC:Country-PrimaryLocationName" should contain "Nederland"
-//            And tag "XMP:State" should contain "Zeeland"
-//            And tag "IPTC:Province-State" should contain "Zeeland"
-//            And tag "IPTC:ObjectName" should contain "Bruinisse"
-//            And tag "IPTC:Sub-location" should contain "Bruinisse"
+            queryResult = "{\"place_id\":137959627,\"licence\":\"Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright\",\"osm_type\":\"way\",\"osm_id\":262113993,\"lat\":\"51.67877565\",\"lon\":\"4.13843211722729\",\"display_name\":\"Strandweg, Bruinisse, Schouwen-Duiveland, Zeeland, Nederland, 4311NE, Nederland\",\"address\":{\"parking\":\"Strandweg\",\"road\":\"Strandweg\",\"suburb\":\"Bruinisse\",\"city\":\"Schouwen-Duiveland\",\"state\":\"Zeeland\",\"postcode\":\"4311NE\",\"country\":\"Nederland\",\"country_code\":\"nl\"},\"boundingbox\":[\"51.678328\",\"51.6792308\",\"4.1379332\",\"4.1389456\"]}";
         } else {
             try {
                 queryResult = getRequest(query.toString());

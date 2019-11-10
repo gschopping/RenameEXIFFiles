@@ -33,6 +33,7 @@ public class stepDefinitions {
     private ReadYaml.timeLine element;
     private ReadFiles readFiles;
     private List<File> files;
+    private String errorMessage;
 
     // CreateDate feature =========================================================
 
@@ -151,6 +152,7 @@ public class stepDefinitions {
     public void readGPSTagsAndWriteAddressInformationToFile(String writeFile) throws IOException {
         this.longitude = readEXIF.GetGPSLongitude();
         this.latitude = readEXIF.GetGPSLatitude();
+        this.copyFile = writeFile;
         this.address = OpenStreetMapUtils.getInstance().getAddress(this.latitude, this.longitude);
         if (this.address != null) {
             WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + writeFile);
@@ -167,7 +169,12 @@ public class stepDefinitions {
 
     @Given("configuration file {string}")
     public void configurationFile(String configFile) throws FileNotFoundException, ParseException {
-        this.readYaml = new ReadYaml("Z:\\workspace\\resources\\" + configFile);
+        try {
+            this.readYaml = new ReadYaml("Z:\\workspace\\resources\\" + configFile);
+        }
+        catch (Exception e) {
+            this.errorMessage = e.getMessage();
+        }
     }
 
     @Then("number of timelines should be {int}")
@@ -193,9 +200,6 @@ public class stepDefinitions {
     @And("startdate should be {string}")
     public void startdateShouldBe(String date) {
         String compareDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.element.getStartdate());
-//        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-//        Date compareDate = isoFormat.parse(date);
         Assert.assertEquals(date, compareDate);
     }
 
@@ -212,8 +216,7 @@ public class stepDefinitions {
 
     @Then("an error {string} should be shown")
     public void anErrorShouldBeShown(String errorMessage) {
-        Assert.assertEquals(errorMessage, this.readYaml.getErrorMessages().get(0));
-//        Assert.assertThat(this.readYaml.getErrorMessages().get(0), matchesPattern(errorMessage));
+        Assert.assertEquals(errorMessage, this.errorMessage);
     }
 
     // Directory feature =========================================================
