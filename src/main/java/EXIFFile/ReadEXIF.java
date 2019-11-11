@@ -145,6 +145,11 @@ public class ReadEXIF {
         return result;
     }
 
+    public String getCreateDateTimeString() throws IOException, ParseException {
+        return new SimpleDateFormat("yyyyMMdd-HHmmss").format(this.GetCreateDateTime());
+
+    }
+
 
 
 }

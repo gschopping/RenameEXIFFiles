@@ -56,19 +56,19 @@ public class WriteEXIF {
         }
     }
 
-    public void WriteFile() throws IOException {
+    public void WriteFile(boolean overWrite) throws IOException {
         if (! this.fileType.equals("M2TS")) {
             String result;
             String tempdir =  System.getProperty("java.io.tmpdir");
             writeArguments();
             // Before copting first delete original file
-            try {
-                File file = new File(this.copyFile);
-                if (! file.delete()) {
-                    throw new IOException("Can't delete file " + this.copyFile);
+            if (overWrite) {
+                try {
+                    File file = new File(this.copyFile);
+                    file.delete();
                 }
-            }
-            catch (Exception e) {
+                catch (Exception e) {
+                }
             }
             Process process = Runtime.getRuntime().exec("exiftool.bat -charset IPTC=UTF8 -@ " + tempdir + "arguments.txt " + this.mediaFile + " -o " + this.copyFile);
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));

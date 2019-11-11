@@ -18,8 +18,8 @@ public class ReadYaml {
 //    private List<String> errorMessages;
 
     public class timeLine {
-        private Date startdate;
-        private Date enddate;
+        private Date startdate = null;
+        private Date enddate = null;
         private String title;
         private String countrycode;
         private String country;
@@ -177,11 +177,9 @@ public class ReadYaml {
                     column = Integer.parseInt(matcher.group(2));
                     sentence = matcher.group(4);
                 }
-//                this.errorMessages.add(String.format("Error on line %d, column %d: %s", line, column, sentence));
                 throw new Exception(String.format("Error on line %d, column %d: %s", line, column, sentence));
             }
             else if (errorType.equals("java.io.FileNotFoundException")) {
-//                this.errorMessages.add(String.format("%s not found",configFile));
                 throw new Exception(String.format("%s not found",configFile));
             }
             else if (errorType.equals("java.text.ParseException")) {
@@ -191,11 +189,9 @@ public class ReadYaml {
                 if (matcher.find()) {
                     sentence = matcher.group(1);
                 }
-//                this.errorMessages.add(String.format("Error in timeline %d, incorrect dateformat: %s", lineCount, sentence));
                 throw new Exception(String.format("Error in timeline %d, incorrect dateformat: %s", lineCount, sentence));
             }
             else if (errorType.equals("java.lang.Exception")) {
-//                this.errorMessages.add(String.format("Error in timeline %d, %s", lineCount, e.getMessage()));
                 throw new Exception(String.format("Error in timeline %d, %s", lineCount, e.getMessage()));
             }
             else if (errorType.equals("org.yaml.snakeyaml.composer.ComposerException")) {
@@ -209,12 +205,10 @@ public class ReadYaml {
                     column = Integer.parseInt(matcher.group(2));
                     sentence = matcher.group(4);
                 }
-//                this.errorMessages.add(String.format("Error on line %d, column %d: undefined alias %s", line, column, sentence));
                 throw new Exception(String.format("Error on line %d, column %d: undefined alias %s", line, column, sentence));
             }
             else {
-//                this.errorMessages.add(e.getMessage());
-                throw new Exception(e.getMessage());
+                throw new Exception(String.format("Error in timeline %d: %s", lineCount, e.getMessage()));
             }
         }
     }
@@ -266,6 +260,9 @@ public class ReadYaml {
             value = (String) item.get("description");
             timeline.setDescription(value);
         }
+        if (timeline.startdate == null) {
+            throw new Exception("startdate is not filled");
+        }
         addTimeline(timeline);
     }
 
@@ -294,8 +291,17 @@ public class ReadYaml {
         return this.timeLines;
     }
 
-//    public List<String> getErrorMessages() {
-//        return this.errorMessages;
-//    }
+    public timeLine getTimeLine(Date date) {
+        timeLine result = null;
+        for (timeLine timeline : this.getTimeLines()) {
+            if ((date.compareTo(timeline.getStartdate()) >= 0) &&
+                    ((timeline.getEnddate() == null) ||
+                    (date.compareTo(timeline.getEnddate()) < 0))){
+                result = timeline;
+                break;
+            }
+        }
+        return result;
+    }
 
 }

@@ -13,6 +13,23 @@ Feature: read Yaml file
     And startdate should be "2019-03-22 11:00:00"
     And enddate should be "2019-03-24 11:00:00"
 
+  Scenario: get timeline for certain date and time
+    Given configuration file "start.yml"
+    When date and time is "2019-10-25 15:00:00"
+    Then description should be "Wandeling langs het stuwmeer van de Gileppe"
+
+    Given configuration file "start.yml"
+    When date and time is "2019-10-25 23:00:00"
+    Then description should be "Monschau bij nacht"
+
+    Given configuration file "start.yml"
+    When date and time is "2019-06-28 12:00:00"
+    Then description should be "Wandeling langs de Warche"
+
+    Given configuration file "start.yml"
+    When date and time is "2010-10-25 23:00:00"
+    Then an error "2010-10-25 23:00:00 is outside range timelines" should be shown
+
   Scenario: faulty yaml file
     Given configuration file "not_a_yaml.yml"
     Then an error "Error on line 11, column 5: -startdate: \"2019-04-13 10:00:00\"" should be shown
@@ -32,3 +49,7 @@ Feature: read Yaml file
   Scenario: invalid variable is used
     Given configuration file "invalid_variable.yml"
     Then an error "Error on line 13, column 11: undefined alias <<: *default" should be shown
+
+  Scenario: startdate not filled
+    Given configuration file "null_date.yml"
+    Then an error "Error in timeline 1, startdate is not filled" should be shown

@@ -62,7 +62,7 @@ public class stepDefinitions {
     public void writeAuthor(String author) throws IOException {
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
         writeEXIF.SetAuthor(author);
-        writeEXIF.WriteFile();
+        writeEXIF.WriteFile(true);
     }
 
     @Then("tag {string} should contain {string}")
@@ -77,7 +77,7 @@ public class stepDefinitions {
     public void writeTitle(String title) throws IOException {
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
         writeEXIF.SetTitle(title);
-        writeEXIF.WriteFile();
+        writeEXIF.WriteFile(true);
     }
 
     @When("write Keys {string}")
@@ -85,21 +85,21 @@ public class stepDefinitions {
         String[] results = keys.split(",");
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
         writeEXIF.SetKeys(results);
-        writeEXIF.WriteFile();
+        writeEXIF.WriteFile(true);
     }
 
     @When("write Country {string}")
     public void writeCountry(String country) throws IOException {
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
         writeEXIF.SetCountry(country);
-        writeEXIF.WriteFile();
+        writeEXIF.WriteFile(true);
     }
 
     @When("write City {string}")
     public void writeCity(String city) throws IOException {
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
         writeEXIF.SetCity(city);
-        writeEXIF.WriteFile();
+        writeEXIF.WriteFile(true);
     }
 
     // GPS Tags feature =========================================================
@@ -161,7 +161,7 @@ public class stepDefinitions {
             writeEXIF.SetCity(this.address.get("city"));
             writeEXIF.SetProvince(this.address.get("province"));
             writeEXIF.SetLocation(this.address.get("location"));
-            writeEXIF.WriteFile();
+            writeEXIF.WriteFile(true);
         }
     }
 
@@ -212,6 +212,15 @@ public class stepDefinitions {
     @And("description should be {string}")
     public void descriptionShouldBe(String description) {
         Assert.assertEquals(description, this.element.getDescription());
+    }
+
+    @When("date and time is {string}")
+    public void dateAndTimeIs(String dateString) throws ParseException {
+        Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateString);
+        this.element = this.readYaml.getTimeLine(date);
+        if (this.element == null) {
+            this.errorMessage = String.format("%s is outside range timelines", dateString);
+        }
     }
 
     @Then("an error {string} should be shown")
