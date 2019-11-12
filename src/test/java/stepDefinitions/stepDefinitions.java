@@ -145,7 +145,11 @@ public class stepDefinitions {
 
     @Then("new file should be {string}")
     public void newFileShouldBe(String newFile) {
-        Assert.assertEquals(newFile, FilenameUtils.getName(this.copyFile));
+        File file = new File("Z:\\workspace\\resources\\results\\" + this.copyFile);
+        if (! file.delete()) {
+            Assert.fail();
+        }
+        Assert.assertEquals(newFile, this.copyFile);
     }
 
     // GPS Tags feature =========================================================
