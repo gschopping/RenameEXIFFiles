@@ -4,6 +4,7 @@ import EXIFFile.*;
 import com.drew.imaging.ImageProcessingException;
 import io.cucumber.java.en.*;
 import junit.framework.AssertionFailedError;
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Assert;
 
 import java.io.File;
@@ -34,6 +35,7 @@ public class stepDefinitions {
     private ReadFiles readFiles;
     private List<File> files;
     private String errorMessage;
+    private String title;
 
     // CreateDate feature =========================================================
 
@@ -60,9 +62,9 @@ public class stepDefinitions {
 
     @When("write Author {string}")
     public void writeAuthor(String author) throws IOException {
-        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
+        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
         writeEXIF.SetAuthor(author);
-        writeEXIF.WriteFile(true);
+        writeEXIF.WriteFile("Z:\\workspace\\resources\\" + this.copyFile, true);
     }
 
     @Then("tag {string} should contain {string}")
@@ -75,31 +77,75 @@ public class stepDefinitions {
 
     @When("write Title {string}")
     public void writeTitle(String title) throws IOException {
-        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
+        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
         writeEXIF.SetTitle(title);
-        writeEXIF.WriteFile(true);
+        writeEXIF.WriteFile("Z:\\workspace\\resources\\" + this.copyFile, true);
     }
 
     @When("write Keys {string}")
     public void writeKeys(String keys) throws IOException {
         String[] results = keys.split(",");
-        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
+        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
         writeEXIF.SetKeys(results);
-        writeEXIF.WriteFile(true);
+        writeEXIF.WriteFile("Z:\\workspace\\resources\\" + this.copyFile, true);
     }
 
     @When("write Country {string}")
     public void writeCountry(String country) throws IOException {
-        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
+        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
         writeEXIF.SetCountry(country);
-        writeEXIF.WriteFile(true);
+        writeEXIF.WriteFile("Z:\\workspace\\resources\\" + this.copyFile, true);
     }
 
     @When("write City {string}")
     public void writeCity(String city) throws IOException {
-        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + this.copyFile);
+        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
         writeEXIF.SetCity(city);
-        writeEXIF.WriteFile(true);
+        writeEXIF.WriteFile("Z:\\workspace\\resources\\" + this.copyFile, true);
+    }
+
+    @When("write Title {string} but not delete existing file")
+    public void writeTitleButNotDeleteExistingFile(String title) throws IOException, ParseException {
+        WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
+        writeEXIF.SetTitle(title);
+        char postfix = ' ';
+        boolean noError = false;
+        ReadEXIF readEXIF = new ReadEXIF("Z:\\workspace\\resources\\" + this.mediaFile);
+        while (! noError) {
+            if (postfix == ' ') {
+                this.copyFile = String.format("%s %s.%s",
+                        readEXIF.getCreateDateTimeString(),
+                        title,
+                        FilenameUtils.getExtension(this.mediaFile));
+            }
+            else {
+                this.copyFile = String.format("%s%c %s.%s",
+                        readEXIF.getCreateDateTimeString(),
+                        postfix,
+                        title,
+                        FilenameUtils.getExtension(this.mediaFile));
+            }
+            try {
+                writeEXIF.WriteFile("Z:\\workspace\\resources\\results\\" + this.copyFile, false);
+                noError = true;
+            } catch (Exception e) {
+                if (e.getMessage().matches("^(.* already exists)$")) {
+                    if (postfix == ' ') {
+                        postfix = 'a';
+                    } else {
+                        postfix += 1;
+                    }
+                }
+                else {
+                    noError = true;
+                }
+            }
+        }
+    }
+
+    @Then("new file should be {string}")
+    public void newFileShouldBe(String newFile) {
+        Assert.assertEquals(newFile, FilenameUtils.getName(this.copyFile));
     }
 
     // GPS Tags feature =========================================================
@@ -155,13 +201,13 @@ public class stepDefinitions {
         this.copyFile = writeFile;
         this.address = OpenStreetMapUtils.getInstance().getAddress(this.latitude, this.longitude);
         if (this.address != null) {
-            WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, "Z:\\workspace\\resources\\" + writeFile);
+            WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
             writeEXIF.SetCountryCode(this.address.get("countrycode"));
             writeEXIF.SetCountry(this.address.get("country"));
             writeEXIF.SetCity(this.address.get("city"));
             writeEXIF.SetProvince(this.address.get("province"));
             writeEXIF.SetLocation(this.address.get("location"));
-            writeEXIF.WriteFile(true);
+            writeEXIF.WriteFile("Z:\\workspace\\resources\\" + writeFile, true);
         }
     }
 

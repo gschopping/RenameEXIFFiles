@@ -11,11 +11,13 @@ public class WriteEXIF {
     private String fileType;
     private List<String> arguments;
 
-    public WriteEXIF(String mediaFile, String writeFile) throws IOException {
+    public WriteEXIF(String mediaFile, boolean removeOriginal) throws IOException {
         this.mediaFile = mediaFile;
-        this.copyFile = writeFile;
         this.fileType = this.GetFileType();
         this.arguments = new ArrayList<String>();
+        if (removeOriginal) {
+            this.arguments.add("-overwrite_original");
+        }
     }
 
 
@@ -35,7 +37,7 @@ public class WriteEXIF {
 
     private String GetFileType() throws IOException {
         String fileType;
-        Process process = Runtime.getRuntime().exec("exiftool.bat -s3 -File:FileType " + this.mediaFile);
+        Process process = Runtime.getRuntime().exec("exiftool.bat -s3 -File:FileType \"" + this.mediaFile + "\"");
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         fileType = reader.readLine();
         reader.close();
@@ -56,31 +58,30 @@ public class WriteEXIF {
         }
     }
 
-    public void WriteFile(boolean overWrite) throws IOException {
+    public void WriteFile(String writeFile, boolean overWrite) throws IOException {
         if (! this.fileType.equals("M2TS")) {
             String result;
             String tempdir =  System.getProperty("java.io.tmpdir");
             writeArguments();
             // Before copting first delete original file
+            File file = new File(writeFile);
             if (overWrite) {
-                try {
-                    File file = new File(this.copyFile);
-                    file.delete();
-                }
-                catch (Exception e) {
+                if (file.exists()) {
+                    if (! file.delete()) throw new IOException(String.format("%s can't be deleted", file.getPath()));
                 }
             }
-            Process process = Runtime.getRuntime().exec("exiftool.bat -charset IPTC=UTF8 -@ " + tempdir + "arguments.txt " + this.mediaFile + " -o " + this.copyFile);
+            else {
+                if (file.exists()) throw new IOException(String.format("%s already exists", file.getPath()));
+            }
+            Process process = Runtime.getRuntime().exec("exiftool.bat -charset IPTC=UTF8 -@ " + tempdir + "arguments.txt \"" + this.mediaFile + "\" -o \"" + writeFile + "\"");
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             result = reader.readLine();
             if (result != null) {
                 if (! result.matches("\\s*1 image files created")) {
-                    throw new IOException("Update of file " + this.mediaFile + " failed");
+                    throw new IOException("Update of file " + writeFile + " failed");
                 }
             }
             reader.close();
-            // set to inital value in case you want to write new tags to the same file
-            this.arguments.clear();
         }
     }
 

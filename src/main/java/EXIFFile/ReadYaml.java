@@ -30,6 +30,9 @@ public class ReadYaml {
         private String creator;
         private String website;
         private String copyright;
+        private String comment;
+        private String keys;
+        private String instructions;
 
         public Date getStartdate() {
             return startdate;
@@ -80,6 +83,18 @@ public class ReadYaml {
 
         public String getCopyright() {
             return copyright;
+        }
+
+        public String getComment() {
+            return comment;
+        }
+
+        public String getKeys() {
+            return keys;
+        }
+
+        public String getInstructions() {
+            return instructions;
         }
 
         public void setStartdate(String startdate) throws ParseException {
@@ -137,6 +152,18 @@ public class ReadYaml {
 
         public void setCopyRight(String copyright) {
             this.copyright = copyright;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
+
+        public void setKeys(String keys) {
+            this.keys = keys;
+        }
+
+        public void setInstructions(String instructions) {
+            this.instructions = instructions;
         }
     }
 
@@ -259,6 +286,18 @@ public class ReadYaml {
         if (item.get("description") != null) {
             value = (String) item.get("description");
             timeline.setDescription(value);
+        }
+        if (item.get("comment") != null) {
+            value = (String) item.get("comment");
+            timeline.setComment(value);
+        }
+        if (item.get("instructions") != null) {
+            value = (String) item.get("instructions");
+            timeline.setInstructions(value);
+        }
+        if (item.get("keys") != null) {
+            value = (String) item.get("keys");
+            timeline.setKeys(value);
         }
         if (timeline.startdate == null) {
             throw new Exception("startdate is not filled");

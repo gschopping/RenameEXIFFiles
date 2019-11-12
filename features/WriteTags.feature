@@ -35,3 +35,8 @@ Feature: Unittest write tags
     When write Country "Israël"
     Then tag "XMP:Country" should contain "Israël"
 
+  Scenario: Write Title to Sony jpg file and don't overwrite existing file
+    Given file to read "SonyA77.jpg" and write "results\SonyA77.jpg"
+    When write Title "Zeelandbrug" but not delete existing file
+    Then new file should be "20150612-152606a Zeelandbrug.jpg"
+
