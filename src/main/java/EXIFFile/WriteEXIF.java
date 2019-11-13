@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class WriteEXIF {
     private String mediaFile;
@@ -223,6 +224,15 @@ public class WriteEXIF {
             tags[1] = "XMP:Instructions";
             writeTag(tags, specialInstructions);
         }
+    }
+
+    public void setAddress(Map<String, String> address) throws IOException {
+        setCountryCode(address.get("countrycode"));
+        setCountry(address.get("country"));
+        setCity(address.get("city"));
+        setProvince(address.get("province"));
+        setLocation(address.get("location"));
+
     }
 
 }

@@ -147,7 +147,10 @@ public class ReadEXIF {
 
     public String getCreateDateTimeString() throws IOException, ParseException {
         return new SimpleDateFormat("yyyyMMdd-HHmmss").format(this.getCreateDateTime());
+    }
 
+    public String getCreateDateString() throws IOException, ParseException {
+        return new SimpleDateFormat("yyyyMMdd").format(this.getCreateDateTime());
     }
 
 

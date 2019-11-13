@@ -200,11 +200,7 @@ public class stepDefinitions {
         this.address = OpenStreetMapUtils.getInstance().getAddress(this.latitude, this.longitude);
         if (this.address != null) {
             WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
-            writeEXIF.setCountryCode(this.address.get("countrycode"));
-            writeEXIF.setCountry(this.address.get("country"));
-            writeEXIF.setCity(this.address.get("city"));
-            writeEXIF.setProvince(this.address.get("province"));
-            writeEXIF.setLocation(this.address.get("location"));
+            writeEXIF.setAddress(this.address);
             writeEXIF.writeFile("Z:\\workspace\\resources\\" + writeFile, true);
         }
     }
