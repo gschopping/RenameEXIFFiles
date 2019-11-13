@@ -20,10 +20,10 @@ public class ReadEXIF {
 
     public ReadEXIF(String filePath) throws IOException {
         this.mediaFile = filePath;
-        this.fileType = GetFileType();
+        this.fileType = getFileType();
     }
 
-    private String GetFileType() throws IOException {
+    private String getFileType() throws IOException {
         String fileType;
         Process process = Runtime.getRuntime().exec("exiftool.bat -s3 -File:FileType \"" + this.mediaFile + "\"");
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -32,7 +32,7 @@ public class ReadEXIF {
         return fileType;
     }
 
-    public String GetTag(String tag) throws IOException {
+    public String getTag(String tag) throws IOException {
         String result = "";
         BufferedReader reader;
         String line;
@@ -46,7 +46,7 @@ public class ReadEXIF {
         return result;
     }
 
-    private String GetTimeZone() throws IOException {
+    private String getTimeZone() throws IOException {
         String timezone = "+00:00";
         if (this.fileType.equals("MP4")) {
             BufferedReader reader;
@@ -62,7 +62,7 @@ public class ReadEXIF {
         return timezone;
     }
 
-    public Date GetCreateDateTime() throws IOException, ParseException {
+    public Date getCreateDateTime() throws IOException, ParseException {
         Date date = null;
         Process process = null;
         BufferedReader reader;
@@ -84,7 +84,7 @@ public class ReadEXIF {
             reader.close();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
             date = simpleDateFormat.parse(line);
-            String timeZone = this.GetTimeZone();
+            String timeZone = this.getTimeZone();
             Pattern pattern = Pattern.compile(regexTimeZone);
             Matcher matcher = pattern.matcher(timeZone);
             int hours = 0;
@@ -103,7 +103,7 @@ public class ReadEXIF {
         return date;
     }
 
-    public Double GetGPSLatitude() throws IOException {
+    public Double getGPSLatitude() throws IOException {
         double result = 0.0;
         BufferedReader reader;
         String line;
@@ -124,7 +124,7 @@ public class ReadEXIF {
         return result;
     }
 
-    public Double GetGPSLongitude() throws IOException {
+    public Double getGPSLongitude() throws IOException {
         double result = 0.0;
         BufferedReader reader;
         String line;
@@ -146,7 +146,7 @@ public class ReadEXIF {
     }
 
     public String getCreateDateTimeString() throws IOException, ParseException {
-        return new SimpleDateFormat("yyyyMMdd-HHmmss").format(this.GetCreateDateTime());
+        return new SimpleDateFormat("yyyyMMdd-HHmmss").format(this.getCreateDateTime());
 
     }
 

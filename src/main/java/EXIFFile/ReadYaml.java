@@ -14,25 +14,24 @@ import java.util.regex.Pattern;
 public class ReadYaml {
     private final String regexParser = "line (\\d+), column (\\d+):\n^(\\s*)(.+)$";
     private final String regexDateParser = "^Unparseable date: \"(.+)\"$";
-    private List<timeLine> timeLines;
-//    private List<String> errorMessages;
+    private List<TimeLine> timeLines;
 
-    public class timeLine {
+    public class TimeLine {
         private Date startdate = null;
         private Date enddate = null;
-        private String title;
-        private String countrycode;
-        private String country;
-        private String province;
-        private String city;
-        private String location;
-        private String description;
-        private String creator;
-        private String website;
-        private String copyright;
-        private String comment;
-        private String keys;
-        private String instructions;
+        private String title = "";
+        private String countrycode = "";
+        private String country = "";
+        private String province = "";
+        private String city = "";
+        private String location = "";
+        private String description = "";
+        private String author = "";
+        private String website = "";
+        private String copyright = "";
+        private String comment = "";
+        private String keys = "";
+        private String instructions = "";
 
         public Date getStartdate() {
             return startdate;
@@ -73,8 +72,8 @@ public class ReadYaml {
             return description;
         }
 
-        public String getCreator() {
-            return creator;
+        public String getAuthor() {
+            return author;
         }
 
         public String getWebsite() {
@@ -142,8 +141,8 @@ public class ReadYaml {
             this.description = description;
         }
 
-        public void setCreator(String creator) {
-            this.creator = creator;
+        public void setAuthor(String author) {
+            this.author = author;
         }
 
         public void setWebsite(String website) {
@@ -167,9 +166,9 @@ public class ReadYaml {
         }
     }
 
-    class SortbyDate implements Comparator<timeLine> {
+    class SortbyDate implements Comparator<TimeLine> {
         @Override
-        public int compare(timeLine o1, timeLine o2) {
+        public int compare(TimeLine o1, TimeLine o2) {
             return o1.getStartdate().compareTo(o2.getStartdate());
         }
 
@@ -177,7 +176,7 @@ public class ReadYaml {
 
     public ReadYaml(String configFile) throws Exception {
 //        this.errorMessages = new ArrayList<String>();
-        this.timeLines = new ArrayList<timeLine> ();
+        this.timeLines = new ArrayList<TimeLine> ();
         int lineCount = 0;
         try {
             InputStream input = new FileInputStream(new File(configFile));
@@ -241,7 +240,7 @@ public class ReadYaml {
     }
 
     private void setTimeLine(Map item) throws Exception {
-        timeLine timeline = new timeLine();
+        TimeLine timeline = new TimeLine();
         String value = "";
         if (item.get("countrycode") != null) {
             value = (String) item.get("countrycode");
@@ -261,7 +260,7 @@ public class ReadYaml {
         }
         if (item.get("creator") != null) {
             value = (String) item.get("creator");
-            timeline.setCreator(value);
+            timeline.setAuthor(value);
         }
         if (item.get("website") != null) {
             value = (String) item.get("website");
@@ -305,8 +304,8 @@ public class ReadYaml {
         addTimeline(timeline);
     }
 
-    private void addTimeline(timeLine timeline) throws Exception {
-        for (timeLine element : this.timeLines) {
+    private void addTimeline(TimeLine timeline) throws Exception {
+        for (TimeLine element : this.timeLines) {
             if (timeline.getStartdate().equals(element.getStartdate())) {
                 throw new Exception(String.format("startdate: %tF %tT already exists", timeline.getStartdate(), timeline.getStartdate()));
             }
@@ -324,15 +323,15 @@ public class ReadYaml {
         }
     }
 
-    public List<timeLine> getTimeLines() {
+    public List<TimeLine> getTimeLines() {
         Collections.sort(this.timeLines, new SortbyDate());
         setEnddate();
         return this.timeLines;
     }
 
-    public timeLine getTimeLine(Date date) {
-        timeLine result = null;
-        for (timeLine timeline : this.getTimeLines()) {
+    public TimeLine getTimeLine(Date date) {
+        TimeLine result = null;
+        for (TimeLine timeline : this.getTimeLines()) {
             if ((date.compareTo(timeline.getStartdate()) >= 0) &&
                     ((timeline.getEnddate() == null) ||
                     (date.compareTo(timeline.getEnddate()) < 0))){

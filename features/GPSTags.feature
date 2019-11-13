@@ -21,3 +21,9 @@ Feature: Read GPS tags and get address
     And tag "IPTC:Province-State" should contain "Zeeland"
     And tag "IPTC:ObjectName" should contain "Bruinisse"
     And tag "IPTC:Sub-location" should contain "Bruinisse"
+
+  Scenario: Read GPS if not in file
+    Given File "SonyA6300.ARW"
+    When read GPS tags
+    Then latitude should be "0.0"
+    And longitude should be "0.0"

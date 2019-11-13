@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OpenStreetMapUtils {
-//    public final static Logger log = Logger.getLogger("OpenStreetMapUtils");
 
     private static OpenStreetMapUtils instance = null;
 
@@ -61,6 +60,10 @@ public class OpenStreetMapUtils {
     }
 
     public Map<String, String> getAddress(Double latitude, Double longitude) {
+
+        if ((latitude == 0) || (longitude ==0)) {
+            return null;
+        }
         Map<String, String> res;
         StringBuffer query;
         String queryResult = null;

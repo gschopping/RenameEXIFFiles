@@ -3,23 +3,17 @@ package stepDefinitions;
 import EXIFFile.*;
 import com.drew.imaging.ImageProcessingException;
 import io.cucumber.java.en.*;
-import junit.framework.AssertionFailedError;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Assert;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 import static org.hamcrest.Matchers.matchesPattern;
 
@@ -31,7 +25,7 @@ public class stepDefinitions {
     private Double latitude;
     private Double longitude;
     private ReadYaml readYaml;
-    private ReadYaml.timeLine element;
+    private ReadYaml.TimeLine element;
     private ReadFiles readFiles;
     private List<File> files;
     private String errorMessage;
@@ -47,7 +41,7 @@ public class stepDefinitions {
 
     @Then("the creationdate is {string}")
     public void theCreationdateIs(String creationDate) throws IOException, ParseException {
-        String compareDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.readEXIF.GetCreateDateTime());
+        String compareDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.readEXIF.getCreateDateTime());
         Assert.assertEquals(creationDate, compareDate);
     }
 
@@ -63,14 +57,14 @@ public class stepDefinitions {
     @When("write Author {string}")
     public void writeAuthor(String author) throws IOException {
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
-        writeEXIF.SetAuthor(author);
-        writeEXIF.WriteFile("Z:\\workspace\\resources\\" + this.copyFile, true);
+        writeEXIF.setAuthor(author);
+        writeEXIF.writeFile("Z:\\workspace\\resources\\" + this.copyFile, true);
     }
 
     @Then("tag {string} should contain {string}")
     public void tagShouldContain(String tag, String value) throws IOException {
         ReadEXIF readEXIF = new ReadEXIF("Z:\\workspace\\resources\\" + this.copyFile);
-        String result = readEXIF.GetTag(tag);
+        String result = readEXIF.getTag(tag);
         Assert.assertEquals(value, result);
 
     }
@@ -78,36 +72,36 @@ public class stepDefinitions {
     @When("write Title {string}")
     public void writeTitle(String title) throws IOException {
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
-        writeEXIF.SetTitle(title);
-        writeEXIF.WriteFile("Z:\\workspace\\resources\\" + this.copyFile, true);
+        writeEXIF.setTitle(title);
+        writeEXIF.writeFile("Z:\\workspace\\resources\\" + this.copyFile, true);
     }
 
     @When("write Keys {string}")
     public void writeKeys(String keys) throws IOException {
         String[] results = keys.split(",");
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
-        writeEXIF.SetKeys(results);
-        writeEXIF.WriteFile("Z:\\workspace\\resources\\" + this.copyFile, true);
+        writeEXIF.setKeys(results);
+        writeEXIF.writeFile("Z:\\workspace\\resources\\" + this.copyFile, true);
     }
 
     @When("write Country {string}")
     public void writeCountry(String country) throws IOException {
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
-        writeEXIF.SetCountry(country);
-        writeEXIF.WriteFile("Z:\\workspace\\resources\\" + this.copyFile, true);
+        writeEXIF.setCountry(country);
+        writeEXIF.writeFile("Z:\\workspace\\resources\\" + this.copyFile, true);
     }
 
     @When("write City {string}")
     public void writeCity(String city) throws IOException {
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
-        writeEXIF.SetCity(city);
-        writeEXIF.WriteFile("Z:\\workspace\\resources\\" + this.copyFile, true);
+        writeEXIF.setCity(city);
+        writeEXIF.writeFile("Z:\\workspace\\resources\\" + this.copyFile, true);
     }
 
     @When("write Title {string} but not delete existing file")
     public void writeTitleButNotDeleteExistingFile(String title) throws IOException, ParseException {
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
-        writeEXIF.SetTitle(title);
+        writeEXIF.setTitle(title);
         char postfix = ' ';
         boolean noError = false;
         ReadEXIF readEXIF = new ReadEXIF("Z:\\workspace\\resources\\" + this.mediaFile);
@@ -126,7 +120,7 @@ public class stepDefinitions {
                         FilenameUtils.getExtension(this.mediaFile));
             }
             try {
-                writeEXIF.WriteFile("Z:\\workspace\\resources\\results\\" + this.copyFile, false);
+                writeEXIF.writeFile("Z:\\workspace\\resources\\results\\" + this.copyFile, false);
                 noError = true;
             } catch (Exception e) {
                 if (e.getMessage().matches("^(.* already exists)$")) {
@@ -193,25 +187,25 @@ public class stepDefinitions {
 
     @When("read GPS tags")
     public void readGPSTags() throws IOException {
-        this.longitude = readEXIF.GetGPSLongitude();
-        this.latitude = readEXIF.GetGPSLatitude();
+        this.longitude = readEXIF.getGPSLongitude();
+        this.latitude = readEXIF.getGPSLatitude();
         this.address = OpenStreetMapUtils.getInstance().getAddress(this.latitude, this.longitude);
     }
 
     @When("read GPS tags and write address information to file {string}")
     public void readGPSTagsAndWriteAddressInformationToFile(String writeFile) throws IOException {
-        this.longitude = readEXIF.GetGPSLongitude();
-        this.latitude = readEXIF.GetGPSLatitude();
+        this.longitude = readEXIF.getGPSLongitude();
+        this.latitude = readEXIF.getGPSLatitude();
         this.copyFile = writeFile;
         this.address = OpenStreetMapUtils.getInstance().getAddress(this.latitude, this.longitude);
         if (this.address != null) {
             WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
-            writeEXIF.SetCountryCode(this.address.get("countrycode"));
-            writeEXIF.SetCountry(this.address.get("country"));
-            writeEXIF.SetCity(this.address.get("city"));
-            writeEXIF.SetProvince(this.address.get("province"));
-            writeEXIF.SetLocation(this.address.get("location"));
-            writeEXIF.WriteFile("Z:\\workspace\\resources\\" + writeFile, true);
+            writeEXIF.setCountryCode(this.address.get("countrycode"));
+            writeEXIF.setCountry(this.address.get("country"));
+            writeEXIF.setCity(this.address.get("city"));
+            writeEXIF.setProvince(this.address.get("province"));
+            writeEXIF.setLocation(this.address.get("location"));
+            writeEXIF.writeFile("Z:\\workspace\\resources\\" + writeFile, true);
         }
     }
 
