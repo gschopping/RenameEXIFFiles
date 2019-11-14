@@ -305,4 +305,11 @@ public class stepDefinitions {
         Assert.assertEquals(count, this.files.size());
     }
 
+    @When("rename all files")
+    public void renameAllFiles() {
+    }
+
+    @Then("in subdirectory {string} {int} files will be found")
+    public void inSubdirectoryFilesWillBeFound(String arg0, int arg1) {
+    }
 }
