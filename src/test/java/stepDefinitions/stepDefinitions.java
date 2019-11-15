@@ -29,7 +29,9 @@ public class stepDefinitions {
     private ReadFiles readFiles;
     private List<File> files;
     private String errorMessage;
-    private String title;
+    private RenameFiles renameFiles;
+    private String directory;
+    private String configFile;
 
     // CreateDate feature =========================================================
 
@@ -208,7 +210,8 @@ public class stepDefinitions {
     // Read Yaml feature =========================================================
 
     @Given("configuration file {string}")
-    public void configurationFile(String configFile) throws FileNotFoundException, ParseException {
+    public void configurationFile(String configFile) {
+        this.configFile = configFile;
         try {
             this.readYaml = new ReadYaml("Z:\\workspace\\resources\\" + configFile);
         }
@@ -272,6 +275,7 @@ public class stepDefinitions {
 
     @Given("directory {string}")
     public void directory(String directory) {
+        this.directory = directory;
         this.readFiles = new ReadFiles(directory);
     }
 
@@ -306,10 +310,15 @@ public class stepDefinitions {
     }
 
     @When("rename all files")
-    public void renameAllFiles() {
+    public void renameAllFiles() throws Exception {
+        this.renameFiles = new RenameFiles(this.directory, this.configFile);
+        this.renameFiles.RenameRootFiles();
     }
 
     @Then("in subdirectory {string} {int} files will be found")
-    public void inSubdirectoryFilesWillBeFound(String arg0, int arg1) {
+    public void inSubdirectoryFilesWillBeFound(String subdir, int count) {
+        File dir = new File(subdir);
+        File[] files = dir.listFiles();
+        Assert.assertEquals(count, files.length);
     }
 }

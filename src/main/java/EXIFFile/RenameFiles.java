@@ -17,7 +17,7 @@ public class RenameFiles {
         this.configFile = configFile;
     }
 
-    public void RenameFile(ReadEXIF readEXIF, ReadYaml.TimeLine timeline, File file) throws IOException, ParseException {
+    private void RenameFile(ReadEXIF readEXIF, ReadYaml.TimeLine timeline, File file) throws Exception {
         char postfix=' ';
         // write all tags
         WriteEXIF writeEXIF = new WriteEXIF(file.getPath(), true);
@@ -66,14 +66,14 @@ public class RenameFiles {
                     }
                 }
                 else {
-                    noError = true;
+                    throw new Exception(e.getMessage());
                 }
             }
         }
 
     }
 
-    public void RenameFileWithAddress(Map<String, String> address, ReadYaml.TimeLine timeline, String dateString, int counter, File file) throws IOException {
+    private void RenameFileWithAddress(Map<String, String> address, ReadYaml.TimeLine timeline, String dateString, int counter, File file) throws Exception {
         char postfix=' ';
         // write all tags
         WriteEXIF writeEXIF = new WriteEXIF(file.getPath(), true);
@@ -116,86 +116,62 @@ public class RenameFiles {
                     }
                 }
                 else {
-                    noError = true;
+                    throw new Exception(e.getMessage());
                 }
             }
         }
 
     }
 
-    public void RenameRootFiles() {
-        try {
-            ReadYaml readYaml = new ReadYaml(configFile);
-            ReadFiles readFiles = new ReadFiles(this.startDirectory);
-            for (File file : readFiles.getFilesFromDirectory()) {
-                ReadEXIF readEXIF = new ReadEXIF(file.getPath());
+    public void RenameRootFiles() throws Exception {
+        ReadYaml readYaml = new ReadYaml(configFile);
+        ReadFiles readFiles = new ReadFiles(this.startDirectory);
+        for (File file : readFiles.getFilesFromDirectory()) {
+            ReadEXIF readEXIF = new ReadEXIF(file.getPath());
 // timeline is found, now you can set all information in mediafile
 // create new name for mediafile
-                try {
-                    ReadYaml.TimeLine timeline = readYaml.getTimeLine(readEXIF.getCreateDateTime());
-                    if (timeline != null) {
-                        try {
-                            RenameFile(readEXIF, timeline, file);
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
-                    } else {
-                        System.out.println(String.format("%s with %tF %tT has a creationdate before all timelines",
-                                file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
-                    }
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
+            ReadYaml.TimeLine timeline = readYaml.getTimeLine(readEXIF.getCreateDateTime());
+            if (timeline != null) {
+                RenameFile(readEXIF, timeline, file);
+            } else {
+                System.out.println(String.format("%s with %tF %tT has a creationdate before all timelines",
+                        file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
             }
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
         }
     }
 
-    public void RenameTimelapsFiles() {
-        try {
-            ReadYaml readYaml = new ReadYaml(this.configFile);
-            // read timelaps subdirectories
-            ReadFiles readFiles = new ReadFiles(this.startDirectory);
-            int counter = 1;
-            for (File dir : readFiles.getTimelapsDirectories()) {
-                List<File> timelapsFiles = readFiles.getTimelapsFiles(dir);
-                Map<String, String> address = null;
-                String dateString = "";
-                if (timelapsFiles.size() > 0) {
-                    File file = timelapsFiles.get(timelapsFiles.size() - 1);
-                    try {
-                        ReadEXIF readEXIF = new ReadEXIF(file.getPath());
-                        // read from Yaml file in order to retrieve some default information
-                        ReadYaml.TimeLine timeline = readYaml.getTimeLine(readEXIF.getCreateDateTime());
-                        if (timeline != null) {
-                            // retrieve if possible GPS coordinates
-                            Double latitude = readEXIF.getGPSLatitude();
-                            Double longitude = readEXIF.getGPSLongitude();
-                            address = OpenStreetMapUtils.getInstance().getAddress(latitude, longitude);
-                            dateString = readEXIF.getCreateDateString();
-                            for (File timelapsFile : timelapsFiles) {
-                                if (address != null) {
-                                    RenameFileWithAddress(address, timeline, dateString, counter, timelapsFile);
-                                }
-                            }
+    public void RenameTimelapsFiles() throws Exception {
+        ReadYaml readYaml = new ReadYaml(this.configFile);
+        // read timelaps subdirectories
+        ReadFiles readFiles = new ReadFiles(this.startDirectory);
+        int counter = 1;
+        for (File dir : readFiles.getTimelapsDirectories()) {
+            List<File> timelapsFiles = readFiles.getTimelapsFiles(dir);
+            Map<String, String> address;
+            String dateString = "";
+            if (timelapsFiles.size() > 0) {
+                File file = timelapsFiles.get(timelapsFiles.size() - 1);
+                ReadEXIF readEXIF = new ReadEXIF(file.getPath());
+                // read from Yaml file in order to retrieve some default information
+                ReadYaml.TimeLine timeline = readYaml.getTimeLine(readEXIF.getCreateDateTime());
+                if (timeline != null) {
+                    // retrieve if possible GPS coordinates
+                    Double latitude = readEXIF.getGPSLatitude();
+                    Double longitude = readEXIF.getGPSLongitude();
+                    address = OpenStreetMapUtils.getInstance().getAddress(latitude, longitude);
+                    dateString = readEXIF.getCreateDateString();
+                    for (File timelapsFile : timelapsFiles) {
+                        if (address != null) {
+                            RenameFileWithAddress(address, timeline, dateString, counter, timelapsFile);
                         }
-                        else {
-                            System.out.println(String.format("%s with %tF %tT has a creationdate before all timelines",
-                                    file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
-                        }
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
                     }
                 } else {
-                    System.out.println(String.format("No files in %s", dir.getPath()));
+                    System.out.println(String.format("%s with %tF %tT has a creationdate before all timelines",
+                            file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
                 }
+            } else {
+                System.out.println(String.format("No files in %s", dir.getPath()));
             }
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
         }
     }
-
 }
