@@ -1,5 +1,7 @@
 package EXIFFile;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +10,20 @@ import java.util.Locale;
 public class WriteEXIF {
     private String mediaFile;
     private String fileType;
+    private boolean isWritable;
+    private boolean removeOriginal;
     private List<String> arguments;
 
     public WriteEXIF(String mediaFile, boolean removeOriginal) throws IOException {
         this.mediaFile = mediaFile;
+        this.removeOriginal = removeOriginal;
         this.fileType = this.getFileType();
+        if (this.fileType.equals("JPG") || this.fileType.equals("ARW") || this.fileType.equals("MP4") || this.fileType.equals("DNG")) {
+            this.isWritable = true;
+        }
+        else {
+            this.isWritable = false;
+        }
         this.arguments = new ArrayList<String>();
         if (removeOriginal) {
             this.arguments.add("-overwrite_original");
@@ -58,20 +69,21 @@ public class WriteEXIF {
     }
 
     public void writeFile(String writeFile, boolean overWrite) throws IOException {
-        if (! this.fileType.equals("M2TS")) {
+        File destinationFile = new File(writeFile);
+        if (overWrite) {
+            if (destinationFile.exists()) {
+                if (! destinationFile.delete()) throw new IOException(String.format("%s can't be deleted", destinationFile.getPath()));
+            }
+        }
+        else {
+            if (destinationFile.exists()) throw new IOException(String.format("%s already exists", destinationFile.getPath()));
+        }
+        if (this.isWritable) {
             String result;
             String tempdir =  System.getProperty("java.io.tmpdir");
             writeArguments();
             // Before copting first delete original file
-            File file = new File(writeFile);
-            if (overWrite) {
-                if (file.exists()) {
-                    if (! file.delete()) throw new IOException(String.format("%s can't be deleted", file.getPath()));
-                }
-            }
-            else {
-                if (file.exists()) throw new IOException(String.format("%s already exists", file.getPath()));
-            }
+
             Process process = Runtime.getRuntime().exec("exiftool.bat -charset IPTC=UTF8 -@ " + tempdir + "arguments.txt \"" + this.mediaFile + "\" -o \"" + writeFile + "\"");
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             // read result first line
@@ -84,6 +96,14 @@ public class WriteEXIF {
                 }
             }
             reader.close();
+        }
+        else {
+            if (this.removeOriginal) {
+                FileUtils.moveFile(new File(this.mediaFile), destinationFile);
+            }
+            else {
+                FileUtils.copyFile(new File(this.mediaFile), destinationFile);
+            }
         }
     }
 

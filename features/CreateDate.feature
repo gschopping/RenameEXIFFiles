@@ -23,6 +23,10 @@ Feature: Unittest CreateDate
   Scenario: Read date from M2TS file
     Given File "SonyA77.m2ts"
     Then the creationdate is "2016-08-07 19:00:56"
+    
+  Scenario: Read data from AVI file
+    Given File "SonyA6300.AVI"
+    Then the creationdate is "2019-08-30 22:42:25"
 
 
 

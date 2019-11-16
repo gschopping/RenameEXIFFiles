@@ -77,6 +77,8 @@ public class ReadEXIF {
             process = Runtime.getRuntime().exec("exiftool.bat -s3 -QuickTime:CreateDate \"" + this.mediaFile + "\"");
         } else if (this.fileType.equals("M2TS")) {
             process = Runtime.getRuntime().exec("exiftool.bat -s3 -H264:DateTimeOriginal \"" + this.mediaFile + "\"");
+        } else if (this.fileType.equals("AVI")) {
+            process = Runtime.getRuntime().exec("exiftool.bat -s3 -File:FileModifyDate \"" + this.mediaFile + "\"");
         }
         if (process != null) {
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()));

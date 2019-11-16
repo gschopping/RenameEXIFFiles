@@ -318,7 +318,7 @@ public class stepDefinitions {
         File source = new File(this.directory + "\\org");
         File dest = new File(this.directory);
         FileUtils.copyDirectory(source, dest);
-        this.renameFiles = new RenameFiles(this.directory, this.configFile);
+        this.renameFiles = new RenameFiles(null, this.directory, this.configFile);
         this.renameFiles.RenameRootFiles();
     }
 
@@ -338,7 +338,7 @@ public class stepDefinitions {
         File source = new File(this.directory + "\\org\\" + subdir);
         File dest = new File(this.directory + "\\" + subdir);
         FileUtils.copyDirectory(source, dest);
-        this.renameFiles = new RenameFiles(this.directory, this.configFile);
+        this.renameFiles = new RenameFiles(null, this.directory, this.configFile);
         this.renameFiles.RenameTimelapsFiles();
     }
 }

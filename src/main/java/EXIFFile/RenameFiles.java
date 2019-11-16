@@ -1,19 +1,19 @@
 package EXIFFile;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class RenameFiles {
+    private Logger logger;
     private String startDirectory;
     private String configFile;
 
-    public RenameFiles(String startDirectory, String configFile) {
+    public RenameFiles(Logger logger, String startDirectory, String configFile) {
+        this.logger = logger;
         this.startDirectory = startDirectory;
         this.configFile = configFile;
     }
@@ -58,6 +58,10 @@ public class RenameFiles {
                         timeline.getTitle(),
                         FilenameUtils.getExtension(file.getName()));
             }
+            if (logger != null) {
+                logger.info(String.format("%s =>\t%s\t(%s, %s, %s, %s)", file.getName(), newFileName,
+                        timeline.getCountry(), timeline.getCity(), timeline.getLocation(), timeline.getDescription()));
+            }
             System.out.println(String.format("%s =>\t%s\t(%s, %s, %s, %s)", file.getName(), newFileName,
                     timeline.getCountry(), timeline.getCity(), timeline.getLocation(), timeline.getDescription()));
             try {
@@ -81,10 +85,18 @@ public class RenameFiles {
 
     private void RenameTimelapsFile(OpenStreetMapUtils.Address address, ReadYaml.TimeLine timeline, String dateString, String subdir, int counter, File file) throws Exception {
         char postfix=' ';
+        String title = "";
+        String country = "";
+        String city = "";
+        String location = "";
         // write all tags
         WriteEXIF writeEXIF = new WriteEXIF(file.getPath(), true);
         if ((address != null) && address.getIsSet()) {
             writeEXIF.setAddress(address);
+            title = address.getLocation();
+            country = address.getCountry();
+            city = address.getCity();
+            location = address.getLocation();
         }
         else {
             writeEXIF.setCountryCode(timeline.getCountrycode());
@@ -92,6 +104,10 @@ public class RenameFiles {
             writeEXIF.setProvince(timeline.getProvince());
             writeEXIF.setCity(timeline.getCity());
             writeEXIF.setLocation(timeline.getLocation());
+            title = timeline.getTitle();
+            country = timeline.getCountry();
+            city = timeline.getCity();
+            location = timeline.getLocation();
         }
         writeEXIF.setAuthor(timeline.getAuthor());
         writeEXIF.setCopyright(timeline.getCopyright());
@@ -105,7 +121,7 @@ public class RenameFiles {
                 newFileName = String.format("%s-%04d %s.%s",
                         dateString,
                         counter,
-                        address.getLocation(),
+                        title,
                         FilenameUtils.getExtension(file.getName()));
 
             }
@@ -114,11 +130,15 @@ public class RenameFiles {
                         dateString,
                         postfix,
                         counter,
-                        address.getLocation(),
+                        title,
                         FilenameUtils.getExtension(file.getName()));
             }
+            if (logger != null) {
+                this.logger.info(String.format("%s =>\t%s\t(%s, %s, %s)", file.getName(), newFileName,
+                        country, city, location));
+            }
             System.out.println(String.format("%s =>\t%s\t(%s, %s, %s)", file.getName(), newFileName,
-                    address.getCountry(), address.getCity(), address.getLocation()));
+                    country, city, location));
             try {
                 writeEXIF.writeFile(subdir + "\\results\\" + newFileName, false);
                 noError = true;
@@ -153,6 +173,10 @@ public class RenameFiles {
                 OpenStreetMapUtils.Address address = OpenStreetMapUtils.getInstance().getAddress(latitude, longitude);
                 RenameFile(address, timeline, dateString, file);
             } else {
+                if (logger != null) {
+                    this.logger.info(String.format("%s with %tF %tT has a creationdate before all timelines",
+                            file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
+                }
                 System.out.println(String.format("%s with %tF %tT has a creationdate before all timelines",
                         file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
             }
@@ -194,10 +218,17 @@ public class RenameFiles {
                         counter++;
                     }
                 } else {
+                    if (logger != null) {
+                        this.logger.info(String.format("%s with %tF %tT has a creationdate before all timelines",
+                                file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
+                    }
                     System.out.println(String.format("%s with %tF %tT has a creationdate before all timelines",
                             file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
                 }
             } else {
+                if (logger != null) {
+                    this.logger.info(String.format("No files in %s", dir.getPath()));
+                }
                 System.out.println(String.format("No files in %s", dir.getPath()));
             }
         }

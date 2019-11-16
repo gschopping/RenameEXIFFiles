@@ -7,9 +7,9 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ReadFiles {
-    private final String regexMedia = "^(.*\\.MP4|.*\\.ARW|.*\\.JPG|.*\\.DNG|.*\\.M2TS)$";
+    private final String regexMedia = "^(.*\\.MP4|.*\\.ARW|.*\\.JPG|.*\\.DNG|.*\\.M2TS|.*\\.AVI)$";
     private final String regexTimelaps = "^(Timelaps\\d+)$";
-    private final String regexTimelapsFile = "^(.*\\.ARW)$";
+    private final String regexTimelapsFile = "^(.*\\.ARW|.*\\.JPG|.*\\.DNG)$";
     private String path;
 
     public ReadFiles(String path) {
