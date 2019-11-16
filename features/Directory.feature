@@ -4,8 +4,8 @@ Feature: Read Files
     Given directory "Z:\workspace\resources"
     When read all media files
     Then the number of files should be 10
-    And the first file should be "OnePlus2.mp4"
-    And the last file should be "SonyA6300.MP4"
+    And the first file should be "SonyA77.m2ts"
+    And the last file should be "SonyA77.ARW"
 
   Scenario: Read subdirectories with Timelaps files
     Given directory "Z:\workspace\resources"

@@ -3,6 +3,7 @@ package stepDefinitions;
 import EXIFFile.*;
 import com.drew.imaging.ImageProcessingException;
 import io.cucumber.java.en.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Assert;
 
@@ -21,7 +22,7 @@ public class stepDefinitions {
     private String mediaFile;
     private String copyFile;
     private ReadEXIF readEXIF;
-    private Map<String, String> address;
+    private OpenStreetMapUtils.Address address;
     private Double latitude;
     private Double longitude;
     private ReadYaml readYaml;
@@ -163,7 +164,7 @@ public class stepDefinitions {
     @And("street should be {string}")
     public void streetShouldBe(String street) throws IOException {
         if (address != null) {
-            Assert.assertEquals(street, address.get("street"));
+            Assert.assertEquals(street, address.getStreet());
         } else {
             Assert.fail();
         }
@@ -172,7 +173,7 @@ public class stepDefinitions {
     @And("location should be {string}")
     public void locationShouldBe(String location) {
         if (address != null) {
-            Assert.assertEquals(location, address.get("location"));
+            Assert.assertEquals(location, address.getLocation());
         } else {
             Assert.fail();
         }
@@ -181,7 +182,7 @@ public class stepDefinitions {
     @And("city should be {string}")
     public void cityShouldBe(String city) {
         if (address != null) {
-            Assert.assertEquals(city, address.get("city"));
+            Assert.assertEquals(city, address.getCity());
         } else {
             Assert.fail();
         }
@@ -311,14 +312,33 @@ public class stepDefinitions {
 
     @When("rename all files")
     public void renameAllFiles() throws Exception {
+        // delete results directory
+        FileUtils.deleteDirectory(new File(this.directory + "\\results"));
+        // copy from org
+        File source = new File(this.directory + "\\org");
+        File dest = new File(this.directory);
+        FileUtils.copyDirectory(source, dest);
         this.renameFiles = new RenameFiles(this.directory, this.configFile);
         this.renameFiles.RenameRootFiles();
     }
 
     @Then("in subdirectory {string} {int} files will be found")
-    public void inSubdirectoryFilesWillBeFound(String subdir, int count) {
+    public void inSubdirectoryFilesWillBeFound(String subdir, int count) throws IOException {
         File dir = new File(subdir);
         File[] files = dir.listFiles();
-        Assert.assertEquals(count, files.length);
+        int nrOfFiles = files.length;
+        Assert.assertEquals(count, nrOfFiles);
+    }
+
+    @When("rename all timelaps files in subdir {string}")
+    public void renameAllTimelapsFilesInSubdir(String subdir) throws Exception {
+        // delete results directory
+        FileUtils.deleteDirectory(new File(this.directory + "\\" + subdir + "\\results"));
+        // copy from org
+        File source = new File(this.directory + "\\org\\" + subdir);
+        File dest = new File(this.directory + "\\" + subdir);
+        FileUtils.copyDirectory(source, dest);
+        this.renameFiles = new RenameFiles(this.directory, this.configFile);
+        this.renameFiles.RenameTimelapsFiles();
     }
 }

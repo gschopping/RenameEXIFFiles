@@ -48,7 +48,7 @@ public class ReadYaml {
         }
 
         public String getCountry() {
-            if ((this.country == null) && (this.countrycode != null)) {
+            if (! this.countrycode.isEmpty()) {
                 Locale obj = new Locale("", this.countrycode);
                 return obj.getDisplayCountry();
             } else {

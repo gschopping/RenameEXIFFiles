@@ -11,7 +11,96 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class OpenStreetMapUtils {
+
+    public class Address {
+        private boolean isSet = false;
+        private String countrycode = "";
+        private String country = "";
+        private String province = "";
+        private String city = "";
+        private String location = "";
+        private String postcode = "";
+        private String street = "";
+        private String address = "";
+
+        public String getCountrycode() {
+            return countrycode;
+        }
+
+        public void setCountrycode(String countrycode) {
+            this.isSet = true;
+            this.countrycode = countrycode.toUpperCase();
+        }
+
+        public String getCountry() {
+            return country;
+        }
+
+        public void setCountry(String country) {
+            this.isSet = true;
+            this.country = country;
+        }
+
+        public String getProvince() {
+            return province;
+        }
+
+        public void setProvince(String province) {
+            this.isSet = true;
+            this.province = province;
+        }
+
+        public String getCity() {
+            return city;
+        }
+
+        public void setCity(String city) {
+            this.isSet = true;
+            this.city = city;
+        }
+
+        public String getLocation() {
+            return location;
+        }
+
+        public void setLocation(String location) {
+            this.isSet = true;
+            this.location = location;
+        }
+
+        public String getPostcode() {
+            return postcode;
+        }
+
+        public void setPostcode(String postcode) {
+            this.isSet = true;
+            this.postcode = postcode;
+        }
+
+        public String getStreet() {
+            return street;
+        }
+
+        public void setStreet(String street) {
+            this.isSet = true;
+            this.street = street;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.isSet = true;
+            this.address = address;
+        }
+
+        public boolean getIsSet() {
+            return isSet;
+        }
+    }
 
     private static OpenStreetMapUtils instance = null;
 
@@ -59,17 +148,16 @@ public class OpenStreetMapUtils {
         return response.toString();
     }
 
-    public Map<String, String> getAddress(Double latitude, Double longitude) {
+    public Address getAddress(Double latitude, Double longitude) {
 
         if ((latitude == 0) || (longitude ==0)) {
             return null;
         }
-        Map<String, String> res;
+        Address address = new Address();
         StringBuffer query;
         String queryResult = null;
 
         query = new StringBuffer();
-        res = new HashMap<String, String>();
 
         query.append("https://nominatim.openstreetmap.org/reverse?format=json");
 
@@ -86,6 +174,8 @@ public class OpenStreetMapUtils {
             queryResult = "{\"place_id\":261870388,\"licence\":\"Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright\",\"osm_type\":\"way\",\"osm_id\":168908204,\"lat\":\"51.4541747279983\",\"lon\":\"3.65353658637693\",\"display_name\":\"Rammekensweg, Ritthem, Vlissingen, Zeeland, Nederland, 4389TZ, Nederland\",\"address\":{\"footway\":\"Rammekensweg\",\"suburb\":\"Ritthem\",\"town\":\"Vlissingen\",\"state\":\"Zeeland\",\"postcode\":\"4389TZ\",\"country\":\"Nederland\",\"country_code\":\"nl\"},\"boundingbox\":[\"51.4528958\",\"51.4549397\",\"3.6533426\",\"3.6540872\"]}";
         } else if (latitude.equals(51.679494) && longitude.equals(4.138041)) {
             queryResult = "{\"place_id\":137959627,\"licence\":\"Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright\",\"osm_type\":\"way\",\"osm_id\":262113993,\"lat\":\"51.67877565\",\"lon\":\"4.13843211722729\",\"display_name\":\"Strandweg, Bruinisse, Schouwen-Duiveland, Zeeland, Nederland, 4311NE, Nederland\",\"address\":{\"parking\":\"Strandweg\",\"road\":\"Strandweg\",\"suburb\":\"Bruinisse\",\"city\":\"Schouwen-Duiveland\",\"state\":\"Zeeland\",\"postcode\":\"4311NE\",\"country\":\"Nederland\",\"country_code\":\"nl\"},\"boundingbox\":[\"51.678328\",\"51.6792308\",\"4.1379332\",\"4.1389456\"]}";
+        } else if (latitude.equals(51.616227) && longitude.equals(3.685589)) {
+            queryResult = "{\"place_id\":70656193,\"licence\":\"Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright\",\"osm_type\":\"way\",\"osm_id\":7594894,\"lat\":\"51.6163822677409\",\"lon\":\"3.68442277437964\",\"display_name\":\"Rijksweg 57, Vrouwenpolder, Veere, Zeeland, Nederland, 4354RB, Nederland\",\"address\":{\"road\":\"Rijksweg 57\",\"suburb\":\"Vrouwenpolder\",\"village\":\"Veere\",\"state\":\"Zeeland\",\"postcode\":\"4354RB\",\"country\":\"Nederland\",\"country_code\":\"nl\"},\"boundingbox\":[\"51.6150515\",\"51.618107\",\"3.6842456\",\"3.6846524\"]}";
         } else {
             try {
                 queryResult = getRequest(query.toString());
@@ -102,74 +192,74 @@ public class OpenStreetMapUtils {
         String result = "";
         try {
             String displayName = jObject.getString("display_name");
-            res.put("address", displayName);
+            address.setAddress(displayName);
         } catch (Exception e) {
-            res.put("address", "[Not found]");
+            address.setAddress("");
+        }
+        JSONObject jsonObject = jObject.getJSONObject("address");
+        try {
+            result = jsonObject.getString("road");
+            address.setStreet(result);
+        } catch (Exception e) {
+            try {
+                result = jsonObject.getString("footway");
+                address.setStreet(result);
+            } catch (Exception f) {
+                try {
+                    result = jsonObject.getString("parking");
+                    address.setStreet(result);
+                } catch (Exception g) {
+                    address.setStreet("");
+                }
+            }
         }
         try {
-            JSONObject address = jObject.getJSONObject("address");
-            try {
-                result = address.getString("road");
-                res.put("street", result);
-            } catch (Exception e) {
-                try {
-                    result = address.getString("footway");
-                    res.put("street", result);
-                } catch (Exception f) {
-                    res.put("street", "[Not found]");
-                    try {
-                        result = address.getString("parking");
-                        res.put("street", result);
-                    } catch (Exception g) {
-                        res.put("street", "[Not found]");
-                    }
-                }
-            }
-            try {
-                result = address.getString("suburb");
-                res.put("location", result);
-            } catch (Exception e) {
-                res.put("location", "[Not found]");
-            }
-            try {
-                result = address.getString("town");
-                res.put("city", result);
-            } catch (Exception e) {
-                try {
-                    result = address.getString("city");
-                    res.put("city", result);
-                } catch (Exception f) {
-                    res.put("city", "[Not found]");
-                }
-            }
-            try {
-                result = address.getString("state");
-                res.put("province", result);
-            } catch (Exception e) {
-                res.put("province", "[Not found]");
-            }
-            try {
-                result = address.getString("postcode");
-                res.put("postcode", result);
-            } catch (Exception e) {
-                res.put("postcode", "[Not found]");
-            }
-            try {
-                result = address.getString("country");
-                res.put("country", result);
-            } catch (Exception e) {
-                res.put("country", "[Not found]");
-            }
-            try {
-                result = address.getString("country_code");
-                res.put("countrycode", result.toUpperCase());
-            } catch (Exception e) {
-                res.put("countrycode", "[Not found]");
-            }
+            result = jsonObject.getString("suburb");
+            address.setLocation(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            address.setLocation("");
+        }
+        try {
+            result = jsonObject.getString("town");
+            address.setCity(result);
+        } catch (Exception e) {
+            try {
+                result = jsonObject.getString("city");
+                address.setCity(result);
+            } catch (Exception f) {
+                try {
+                    result = jsonObject.getString("village");
+                    address.setCity(result);
+                } catch (Exception g) {
+                    address.setCity("");
+                }
+            }
+        }
+        try {
+            result = jsonObject.getString("state");
+            address.setProvince(result);
+        } catch (Exception e) {
+            address.setProvince("");
+        }
+        try {
+            result = jsonObject.getString("postcode");
+            address.setPostcode(result);
+        } catch (Exception e) {
+            address.setPostcode("");
+        }
+        try {
+            result = jsonObject.getString("country");
+            address.setCountry(result);
+        } catch (Exception e) {
+            address.setCountry("");
+        }
+        try {
+            result = jsonObject.getString("country_code");
+            address.setCountrycode(result);
+        } catch (Exception e) {
+            address.setCountrycode("");
         }
 
-        return res;
+        return address;
     }
 }

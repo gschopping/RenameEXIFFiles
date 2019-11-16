@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class WriteEXIF {
     private String mediaFile;
@@ -226,12 +225,12 @@ public class WriteEXIF {
         }
     }
 
-    public void setAddress(Map<String, String> address) throws IOException {
-        setCountryCode(address.get("countrycode"));
-        setCountry(address.get("country"));
-        setCity(address.get("city"));
-        setProvince(address.get("province"));
-        setLocation(address.get("location"));
+    public void setAddress(OpenStreetMapUtils.Address address) throws IOException {
+        setCountryCode(address.getCountrycode());
+        setCountry(address.getCountry());
+        setCity(address.getCity());
+        setProvince(address.getProvince());
+        setLocation(address.getLocation());
 
     }
 
