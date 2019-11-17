@@ -12,8 +12,8 @@ public class main {
 
         String configFile = "X:\\Onbewerkt\\start.yml";
         String startdir = "X:\\Onbewerkt";
-
         String log4jConfigFile = "C:\\Program Files\\apache-maven-3.6.2\\bin\\log4j.properties";
+
         PropertyConfigurator.configure(log4jConfigFile);
         log.info(String.format("Configuration file:\t%s", configFile));
         log.info(String.format("Start dicrectory:\t%s", startdir));
@@ -22,7 +22,8 @@ public class main {
         try {
             RenameFiles renameFiles = new RenameFiles(log, startdir, configFile);
             renameFiles.RenameRootFiles();
-            renameFiles.RenameTimelapsFiles();
+            renameFiles.RenameTimelapsFiles(true);
+            renameFiles.RenameTimelapsFiles(false);
         }
         catch (Exception e) {
             log.error(e);

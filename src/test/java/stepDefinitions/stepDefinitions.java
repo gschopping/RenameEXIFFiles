@@ -339,6 +339,6 @@ public class stepDefinitions {
         File dest = new File(this.directory + "\\" + subdir);
         FileUtils.copyDirectory(source, dest);
         this.renameFiles = new RenameFiles(null, this.directory, this.configFile);
-        this.renameFiles.RenameTimelapsFiles();
+        this.renameFiles.RenameTimelapsFiles(true);
     }
 }
