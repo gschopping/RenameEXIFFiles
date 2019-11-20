@@ -341,4 +341,30 @@ public class stepDefinitions {
         this.renameFiles = new RenameFiles(null, this.directory, this.configFile);
         this.renameFiles.RenameTimelapsFiles(true);
     }
+
+    @Then("in subdirectory {string} first file will be {string}")
+    public void inSubdirectoryFileWillBeFound(String subdir, String fileName) {
+        File dir = new File(subdir);
+        File[] files = dir.listFiles();
+        Assert.assertEquals(fileName, files[0].getName());
+    }
+
+    @When("rename all timelaps files")
+    public void renameAllTimelapsFiles() throws Exception {
+        FileUtils.deleteDirectory(new File(this.directory + "\\Timelaps1\\results"));
+        FileUtils.deleteDirectory(new File(this.directory + "\\Timelaps2\\results"));
+        FileUtils.deleteDirectory(new File(this.directory + "\\Timelaps3\\results"));
+        // copy from org
+        File source = new File(this.directory + "\\org\\Timelaps1");
+        File dest = new File(this.directory + "\\Timelaps1");
+        FileUtils.copyDirectory(source, dest);
+        source = new File(this.directory + "\\org\\Timelaps2");
+        dest = new File(this.directory + "\\Timelaps2");
+        FileUtils.copyDirectory(source, dest);
+        source = new File(this.directory + "\\org\\Timelaps3");
+        dest = new File(this.directory + "\\Timelaps3");
+        FileUtils.copyDirectory(source, dest);
+        this.renameFiles = new RenameFiles(null, this.directory, this.configFile);
+        this.renameFiles.RenameTimelapsFiles(true);
+    }
 }
