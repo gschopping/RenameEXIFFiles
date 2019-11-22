@@ -1,15 +1,12 @@
-package EXIFFile;
+package nl.schoepping.EXIFFile;
 
 //import org.apache.log4j.Logger;
-import io.cucumber.java.an.E;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class OpenStreetMapUtils {

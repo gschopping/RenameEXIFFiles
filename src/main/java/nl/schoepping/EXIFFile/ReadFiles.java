@@ -1,4 +1,4 @@
-package EXIFFile;
+package nl.schoepping.EXIFFile;
 
 import java.io.File;
 import java.util.ArrayList;

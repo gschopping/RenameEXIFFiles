@@ -1,4 +1,4 @@
-package EXIFFile;
+package nl.schoepping.EXIFFile;
 
 import org.apache.commons.lang.time.DateUtils;
 

@@ -1,4 +1,4 @@
-package EXIFFile;
+package nl.schoepping.EXIFFile;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -220,7 +220,7 @@ public class ReadYaml {
             else if (errorType.equals("java.lang.Exception")) {
                 throw new Exception(String.format("Error in timeline %d, %s", lineCount, e.getMessage()));
             }
-            else if (errorType.equals("org.yaml.snakeyaml.composer.ComposerException")) {
+            else if (errorType.contains("org.yaml.snakeyaml")) {
                 Pattern pattern = Pattern.compile(regexParser, Pattern.MULTILINE);
                 Matcher matcher = pattern.matcher(e.getMessage());
                 int line = 0;

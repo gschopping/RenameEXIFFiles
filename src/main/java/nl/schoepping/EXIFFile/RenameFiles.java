@@ -1,10 +1,9 @@
-package EXIFFile;
+package nl.schoepping.EXIFFile;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.util.Date;
 import java.util.List;
 
 public class RenameFiles {

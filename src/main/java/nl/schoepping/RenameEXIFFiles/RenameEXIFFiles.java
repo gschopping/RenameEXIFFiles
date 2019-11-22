@@ -1,10 +1,10 @@
-package main;
+package nl.schoepping.RenameEXIFFiles;
 
-import EXIFFile.RenameFiles;
+import nl.schoepping.EXIFFile.RenameFiles;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-public class main {
+public class RenameEXIFFiles {
 
     static Logger log = Logger.getLogger("RenameEXIFFiles");
 
@@ -31,8 +31,9 @@ public class main {
             }
         }
         else
-            log.warn("Missing arguments");
+            System.out.println("Missing arguments");
 
     }
+
 
 }

@@ -1,6 +1,6 @@
 package stepDefinitions;
 
-import EXIFFile.*;
+import nl.schoepping.EXIFFile.*;
 import com.drew.imaging.ImageProcessingException;
 import io.cucumber.java.en.*;
 import org.apache.commons.io.FileUtils;
@@ -8,13 +8,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.junit.Assert;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.matchesPattern;
 

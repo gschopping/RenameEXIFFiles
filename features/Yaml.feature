@@ -33,7 +33,15 @@ Feature: read Yaml file
   Scenario: faulty yaml file
     Given configuration file "not_a_yaml.yml"
     Then an error "Error on line 11, column 5: -startdate: \"2019-04-13 10:00:00\"" should be shown
-    
+
+  Scenario: space missing
+    Given configuration file "not_a_yaml2.yml"
+    Then an error "Error on line 12, column 7: undefined alias title:Tuin" should be shown
+
+  Scenario: invalid character
+    Given configuration file "not_a_yaml3.yml"
+    Then an error "Error on line 14, column 17: undefined alias location: `Thuis" should be shown
+
   Scenario: incorrect date format
     Given configuration file "incorrect_date.yml"
     Then an error "Error in timeline 1, incorrect dateformat: 2019-04 10:00:00" should be shown
