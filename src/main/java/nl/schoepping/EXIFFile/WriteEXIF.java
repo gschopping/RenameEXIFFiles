@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class WriteEXIF {
+    final private String exiftool = "exiftool";
     private String mediaFile;
     private String fileType;
     private boolean isWritable;
@@ -47,7 +48,7 @@ public class WriteEXIF {
 
     private String getFileType() throws IOException {
         String fileType;
-        Process process = Runtime.getRuntime().exec("exiftool.bat -s3 -File:FileType \"" + this.mediaFile + "\"");
+        Process process = Runtime.getRuntime().exec(exiftool + " -s3 -File:FileType \"" + this.mediaFile + "\"");
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         fileType = reader.readLine();
         reader.close();
@@ -84,7 +85,7 @@ public class WriteEXIF {
             writeArguments();
             // Before copting first delete original file
 
-            Process process = Runtime.getRuntime().exec("exiftool.bat -charset IPTC=UTF8 -@ " + tempdir + "arguments.txt \"" + this.mediaFile + "\" -o \"" + writeFile + "\"");
+            Process process = Runtime.getRuntime().exec(exiftool + " -charset IPTC=UTF8 -@ " + tempdir + "arguments.txt \"" + this.mediaFile + "\" -o \"" + writeFile + "\"");
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             // read result first line
             result = reader.readLine();

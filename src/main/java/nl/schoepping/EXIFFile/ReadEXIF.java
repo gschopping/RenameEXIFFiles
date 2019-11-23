@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 public class ReadEXIF {
     final private String regexTimeZone = "^([+-])(\\d{2}):(\\d{2})$";
     final private String regexGPS = "^([\\d.]+) ([NESW])$";
+    final private String exiftool = "exiftool";
     private String mediaFile;
     private String fileType;
 
@@ -25,7 +26,7 @@ public class ReadEXIF {
 
     private String getFileType() throws IOException {
         String fileType;
-        Process process = Runtime.getRuntime().exec("exiftool.bat -s3 -File:FileType \"" + this.mediaFile + "\"");
+        Process process = Runtime.getRuntime().exec(exiftool + " -s3 -File:FileType \"" + this.mediaFile + "\"");
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         fileType = reader.readLine();
         reader.close();
@@ -36,7 +37,7 @@ public class ReadEXIF {
         String result = "";
         BufferedReader reader;
         String line;
-        Process process = Runtime.getRuntime().exec("exiftool.bat -charset IPTC=UTF8 -s3 -" + tag + " \"" + this.mediaFile + "\"");
+        Process process = Runtime.getRuntime().exec(exiftool + " -charset IPTC=UTF8 -s3 -" + tag + " \"" + this.mediaFile + "\"");
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         line = reader.readLine();
         if (line != null) {
@@ -51,7 +52,7 @@ public class ReadEXIF {
         if (this.fileType.equals("MP4")) {
             BufferedReader reader;
             String line;
-            Process process = Runtime.getRuntime().exec("exiftool.bat -s3 -QuickTime:TimeZone \"" + this.mediaFile + "\"");
+            Process process = Runtime.getRuntime().exec(exiftool + " -s3 -QuickTime:TimeZone \"" + this.mediaFile + "\"");
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             line = reader.readLine();
             if ((line != null) && line.matches(regexTimeZone)) {
@@ -68,17 +69,17 @@ public class ReadEXIF {
         BufferedReader reader;
         String line;
         if (this.fileType.equals("JPEG")) {
-            process = Runtime.getRuntime().exec("exiftool.bat -s3 -EXIF:DateTimeOriginal \"" + this.mediaFile + "\"");
+            process = Runtime.getRuntime().exec(exiftool + " -s3 -EXIF:DateTimeOriginal \"" + this.mediaFile + "\"");
         } else if (this.fileType.equals("ARW")) {
-            process = Runtime.getRuntime().exec("exiftool.bat -s3 -EXIF:DateTimeOriginal \"" + this.mediaFile + "\"");
+            process = Runtime.getRuntime().exec(exiftool + " -s3 -EXIF:DateTimeOriginal \"" + this.mediaFile + "\"");
         } else if (this.fileType.equals("DNG")) {
-            process = Runtime.getRuntime().exec("exiftool.bat -s3 -EXIF:DateTimeOriginal \"" + this.mediaFile + "\"");
+            process = Runtime.getRuntime().exec(exiftool + " -s3 -EXIF:DateTimeOriginal \"" + this.mediaFile + "\"");
         } else if (this.fileType.equals("MP4")) {
-            process = Runtime.getRuntime().exec("exiftool.bat -s3 -QuickTime:CreateDate \"" + this.mediaFile + "\"");
+            process = Runtime.getRuntime().exec(exiftool + " -s3 -QuickTime:CreateDate \"" + this.mediaFile + "\"");
         } else if (this.fileType.equals("M2TS")) {
-            process = Runtime.getRuntime().exec("exiftool.bat -s3 -H264:DateTimeOriginal \"" + this.mediaFile + "\"");
+            process = Runtime.getRuntime().exec(exiftool + " -s3 -H264:DateTimeOriginal \"" + this.mediaFile + "\"");
         } else if (this.fileType.equals("AVI")) {
-            process = Runtime.getRuntime().exec("exiftool.bat -s3 -File:FileModifyDate \"" + this.mediaFile + "\"");
+            process = Runtime.getRuntime().exec(exiftool + " -s3 -File:FileModifyDate \"" + this.mediaFile + "\"");
         }
         if (process != null) {
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -109,7 +110,7 @@ public class ReadEXIF {
         double result = 0.0;
         BufferedReader reader;
         String line;
-        Process process = Runtime.getRuntime().exec("exiftool.bat -c \"%.6f\" -Composite:GPSLatitude -s3 \"" + this.mediaFile + "\"");
+        Process process = Runtime.getRuntime().exec(exiftool + " -c \"%.6f\" -Composite:GPSLatitude -s3 \"" + this.mediaFile + "\"");
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         line = reader.readLine();
         if (line != null) {
@@ -130,7 +131,7 @@ public class ReadEXIF {
         double result = 0.0;
         BufferedReader reader;
         String line;
-        Process process = Runtime.getRuntime().exec("exiftool.bat -c \"%.6f\" -Composite:GPSLongitude -s3 \"" + this.mediaFile + "\"");
+        Process process = Runtime.getRuntime().exec(exiftool + " -c \"%.6f\" -Composite:GPSLongitude -s3 \"" + this.mediaFile + "\"");
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         line = reader.readLine();
         if (line != null) {
