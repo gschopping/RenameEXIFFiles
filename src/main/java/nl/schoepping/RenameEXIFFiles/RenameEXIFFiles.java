@@ -17,7 +17,9 @@ public class RenameEXIFFiles {
 
             PropertyConfigurator.configure(log4jConfigFile);
             log.info(String.format("Configuration file:\t%s", configFile));
-            log.info(String.format("Start dicrectory:\t%s", startdir));
+            log.info(String.format("Start directory:\t%s", startdir));
+            log.info(String.format("Homedir:\t%s", System.getProperty("user.dir")));
+
 
 
             try {
@@ -26,8 +28,7 @@ public class RenameEXIFFiles {
                 renameFiles.RenameTimelapsFiles(true);
                 renameFiles.RenameTimelapsFiles(false);
             } catch (Exception e) {
-                log.error(e);
-//            System.out.println(e.getMessage());
+                log.error(e.toString());
             }
         }
         else

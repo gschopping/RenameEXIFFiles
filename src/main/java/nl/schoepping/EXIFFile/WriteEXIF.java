@@ -1,9 +1,11 @@
 package nl.schoepping.EXIFFile;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -14,10 +16,19 @@ public class WriteEXIF {
     private boolean isWritable;
     private boolean removeOriginal;
     private List<String> arguments;
+    private Logger logger = null;
+    private String slash;
+    private String tempfile = "";
 
     public WriteEXIF(String mediaFile, boolean removeOriginal) throws IOException {
         this.mediaFile = mediaFile;
         this.removeOriginal = removeOriginal;
+        this.slash = System.getProperty("file.separator");
+        if (System.getProperty("os.name").contains("Windows")) {
+            this.tempfile =  System.getProperty("user.dir") + "arguments.txt";
+        } else {
+            this.tempfile =  System.getProperty("user.dir") + this.slash + "arguments.txt";
+        }
         this.fileType = this.getFileType();
         if (this.fileType.equals("JPG") || this.fileType.equals("ARW") || this.fileType.equals("MP4") || this.fileType.equals("DNG")) {
             this.isWritable = true;
@@ -31,10 +42,26 @@ public class WriteEXIF {
         }
     }
 
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
+    private String getSpaceReplacedFileName() {
+        return replaceSpaces(this.mediaFile);
+    }
+
+    private String replaceSpaces(String fileName) {
+        String result = fileName;
+        if (System.getProperty("os.name").contains("Windows")) {
+            result = "\"" + fileName + "\"";
+        }
+        return result;
+    }
+
+
 
     private void writeArguments() throws IOException {
-        String tempdir =  System.getProperty("java.io.tmpdir");
-        FileWriter fileWriter = new FileWriter(tempdir + "arguments.txt");
+        FileWriter fileWriter = new FileWriter(tempfile);
         for (String argument : this.arguments) {
             fileWriter.write(argument + "\n");
         }
@@ -48,7 +75,8 @@ public class WriteEXIF {
 
     private String getFileType() throws IOException {
         String fileType;
-        Process process = Runtime.getRuntime().exec(exiftool + " -s3 -File:FileType \"" + this.mediaFile + "\"");
+        String cmdString = exiftool + " -s3 -File:FileType " + getSpaceReplacedFileName();
+        Process process = Runtime.getRuntime().exec(cmdString);
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         fileType = reader.readLine();
         reader.close();
@@ -81,17 +109,26 @@ public class WriteEXIF {
         }
         if (this.isWritable) {
             String result;
-            String tempdir =  System.getProperty("java.io.tmpdir");
             writeArguments();
             // Before copting first delete original file
 
-            Process process = Runtime.getRuntime().exec(exiftool + " -charset IPTC=UTF8 -@ " + tempdir + "arguments.txt \"" + this.mediaFile + "\" -o \"" + writeFile + "\"");
+            String[] cmdString = new String[] { exiftool, "-m", "-@", tempfile, getSpaceReplacedFileName(), "-o",  replaceSpaces(writeFile) };
+            if (logger != null) {
+                logger.debug("WriteEXIF: writeFile " + Arrays.toString(cmdString));
+            }
+            Process process = Runtime.getRuntime().exec(cmdString);
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             // read result first line
             result = reader.readLine();
+            if (logger != null) {
+                logger.debug("WriteEXIF: writeFile " + result);
+            }
             if ((result != null) && (! result.matches("\\s*1 image files (created|updated)"))) {
                 // maybe correct answer on second line
                 result = reader.readLine();
+                if (logger != null) {
+                    logger.debug("WriteEXIF: writeFile " + result);
+                }
                 if ((result != null) && (! result.matches( "\\s*1 image files (created|updated)"))) {
                     throw new IOException("Update of file " + writeFile + " failed");
                 }

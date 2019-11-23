@@ -1,6 +1,7 @@
 package nl.schoepping.EXIFFile;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,6 +17,7 @@ public class ReadEXIF {
     final private String regexTimeZone = "^([+-])(\\d{2}):(\\d{2})$";
     final private String regexGPS = "^([\\d.]+) ([NESW])$";
     final private String exiftool = "exiftool";
+    private Logger logger = null;
     private String mediaFile;
     private String fileType;
 
@@ -24,20 +26,38 @@ public class ReadEXIF {
         this.fileType = getFileType();
     }
 
+    private String getSpaceReplacedFileName() {
+        return replaceSpaces(this.mediaFile);
+    }
+
+    private String replaceSpaces(String fileName) {
+        String result = fileName;
+        if (System.getProperty("os.name").contains("Windows")) {
+            result = "\"" +  fileName + "\"";
+        }
+        return result;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
     private String getFileType() throws IOException {
-        String fileType;
-        Process process = Runtime.getRuntime().exec(exiftool + " -s3 -File:FileType \"" + this.mediaFile + "\"");
+        String line;
+        String[] cmdString = new String[] { exiftool, "-s3", "-File:FileType", getSpaceReplacedFileName() };
+        Process process = Runtime.getRuntime().exec(cmdString);
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        fileType = reader.readLine();
+        line = reader.readLine();
         reader.close();
-        return fileType;
+        return line;
     }
 
     public String getTag(String tag) throws IOException {
         String result = "";
         BufferedReader reader;
         String line;
-        Process process = Runtime.getRuntime().exec(exiftool + " -charset IPTC=UTF8 -s3 -" + tag + " \"" + this.mediaFile + "\"");
+        String[] cmdString = new String[] { exiftool,  "-charset", "IPTC=UTF8", "-s3", "-" + tag, getSpaceReplacedFileName() };
+        Process process = Runtime.getRuntime().exec(cmdString);
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         line = reader.readLine();
         if (line != null) {
@@ -52,7 +72,8 @@ public class ReadEXIF {
         if (this.fileType.equals("MP4")) {
             BufferedReader reader;
             String line;
-            Process process = Runtime.getRuntime().exec(exiftool + " -s3 -QuickTime:TimeZone \"" + this.mediaFile + "\"");
+            String[] cmdString = new String[] { exiftool, "-s3", "-QuickTime:TimeZone", getSpaceReplacedFileName() };
+            Process process = Runtime.getRuntime().exec(cmdString);
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             line = reader.readLine();
             if ((line != null) && line.matches(regexTimeZone)) {
@@ -64,27 +85,41 @@ public class ReadEXIF {
     }
 
     public Date getCreateDateTime() throws IOException, ParseException {
+        if (logger != null) {
+            logger.debug("ReadEXIF: getCreateDateTime");
+        }
         Date date = null;
         Process process = null;
         BufferedReader reader;
         String line;
+        String tag = "";
         if (this.fileType.equals("JPEG")) {
-            process = Runtime.getRuntime().exec(exiftool + " -s3 -EXIF:DateTimeOriginal \"" + this.mediaFile + "\"");
+            tag = "-EXIF:DateTimeOriginal";
         } else if (this.fileType.equals("ARW")) {
-            process = Runtime.getRuntime().exec(exiftool + " -s3 -EXIF:DateTimeOriginal \"" + this.mediaFile + "\"");
+            tag = "-EXIF:DateTimeOriginal";
         } else if (this.fileType.equals("DNG")) {
-            process = Runtime.getRuntime().exec(exiftool + " -s3 -EXIF:DateTimeOriginal \"" + this.mediaFile + "\"");
+            tag = "-EXIF:DateTimeOriginal";
         } else if (this.fileType.equals("MP4")) {
-            process = Runtime.getRuntime().exec(exiftool + " -s3 -QuickTime:CreateDate \"" + this.mediaFile + "\"");
+            tag = "-QuickTime:CreateDate";
         } else if (this.fileType.equals("M2TS")) {
-            process = Runtime.getRuntime().exec(exiftool + " -s3 -H264:DateTimeOriginal \"" + this.mediaFile + "\"");
+            tag = "-H264:DateTimeOriginal";
         } else if (this.fileType.equals("AVI")) {
-            process = Runtime.getRuntime().exec(exiftool + " -s3 -File:FileModifyDate \"" + this.mediaFile + "\"");
+            tag = "-File:FileModifyDate";
+        }
+        if (! tag.isEmpty()) {
+            String[] cmdString = new String[] { exiftool, "-s3", tag, getSpaceReplacedFileName() };
+            process = Runtime.getRuntime().exec(cmdString);
+        }
+        if (logger != null) {
+            logger.debug("ReadEXIF: getCreateDateTime (after DateTime) " + this.fileType);
         }
         if (process != null) {
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             line = reader.readLine();
             reader.close();
+            if (logger != null) {
+                logger.debug("ReadEXIF: getCreateDateTime " + line);
+            }
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
             date = simpleDateFormat.parse(line);
             String timeZone = this.getTimeZone();
@@ -110,10 +145,14 @@ public class ReadEXIF {
         double result = 0.0;
         BufferedReader reader;
         String line;
-        Process process = Runtime.getRuntime().exec(exiftool + " -c \"%.6f\" -Composite:GPSLatitude -s3 \"" + this.mediaFile + "\"");
+        String[] cmdString = new String[] { exiftool, "-c", "%.6f", "-GPSLatitude", "-s3", getSpaceReplacedFileName() };
+        Process process = Runtime.getRuntime().exec(cmdString);
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         line = reader.readLine();
         if (line != null) {
+            if (logger != null) {
+                logger.debug("ReadEXIF: getGPSLatitude " + line);
+            }
             Pattern pattern = Pattern.compile(regexGPS);
             Matcher matcher = pattern.matcher(line);
             if (matcher.matches()) {
@@ -131,10 +170,14 @@ public class ReadEXIF {
         double result = 0.0;
         BufferedReader reader;
         String line;
-        Process process = Runtime.getRuntime().exec(exiftool + " -c \"%.6f\" -Composite:GPSLongitude -s3 \"" + this.mediaFile + "\"");
+        String[] cmdString = new String[] { exiftool, "-c", "%.6f", "-GPSLongitude", "-s3", getSpaceReplacedFileName() };
+        Process process = Runtime.getRuntime().exec(cmdString);
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         line = reader.readLine();
         if (line != null) {
+            if (logger != null) {
+                logger.debug("ReadEXIF: getGPSLongitude " + line);
+            }
             Pattern pattern = Pattern.compile(regexGPS);
             Matcher matcher = pattern.matcher(line);
             if (matcher.matches()) {
@@ -148,11 +191,12 @@ public class ReadEXIF {
         return result;
     }
 
-    public String getCreateDateTimeString() throws IOException, ParseException {
+    public String getCreateDateTimeString() throws IOException, ParseException, InterruptedException {
         return new SimpleDateFormat("yyyyMMdd-HHmmss").format(this.getCreateDateTime());
+//        return new SimpleDateFormat("yyyyMMddHHmmss").format(this.getCreateDateTime());
     }
 
-    public String getCreateDateString() throws IOException, ParseException {
+    public String getCreateDateString() throws IOException, ParseException, InterruptedException {
         return new SimpleDateFormat("yyyyMMdd").format(this.getCreateDateTime());
     }
 

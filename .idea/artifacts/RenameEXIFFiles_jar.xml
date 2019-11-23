@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" build-on-make="true" name="RenameEXIFFiles:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/RenameEXIFFiles_jar</output-path>
+    <output-path>Y:/jar</output-path>
     <root id="archive" name="RenameEXIFFiles.jar">
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/../resources/META-INF/MANIFEST.MF" />

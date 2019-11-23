@@ -35,13 +35,13 @@ public class stepDefinitions {
     // CreateDate feature =========================================================
 
     @Given("File {string}")
-    public void file(String mediaFile) throws ImageProcessingException, IOException {
+    public void file(String mediaFile) throws ImageProcessingException, IOException, InterruptedException {
         this.mediaFile = mediaFile;
         this.readEXIF = new ReadEXIF("Z:\\workspace\\resources\\" + this.mediaFile);
     }
 
     @Then("the creationdate is {string}")
-    public void theCreationdateIs(String creationDate) throws IOException, ParseException {
+    public void theCreationdateIs(String creationDate) throws IOException, ParseException, InterruptedException {
         String compareDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.readEXIF.getCreateDateTime());
         Assert.assertEquals(creationDate, compareDate);
     }
@@ -63,7 +63,7 @@ public class stepDefinitions {
     }
 
     @Then("tag {string} should contain {string}")
-    public void tagShouldContain(String tag, String value) throws IOException {
+    public void tagShouldContain(String tag, String value) throws IOException, InterruptedException {
         ReadEXIF readEXIF = new ReadEXIF("Z:\\workspace\\resources\\" + this.copyFile);
         String result = readEXIF.getTag(tag);
         Assert.assertEquals(value, result);
@@ -100,7 +100,7 @@ public class stepDefinitions {
     }
 
     @When("write Title {string} but not delete existing file")
-    public void writeTitleButNotDeleteExistingFile(String title) throws IOException, ParseException {
+    public void writeTitleButNotDeleteExistingFile(String title) throws IOException, ParseException, InterruptedException {
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
         writeEXIF.setTitle(title);
         char postfix = ' ';
