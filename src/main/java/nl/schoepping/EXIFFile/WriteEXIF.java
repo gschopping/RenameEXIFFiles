@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class WriteEXIF {
-    final private String exiftool = "exiftool";
+    private String exiftool = "exiftool";
     private String mediaFile;
     private String fileType;
     private boolean isWritable;
@@ -26,8 +26,10 @@ public class WriteEXIF {
         this.slash = System.getProperty("file.separator");
         if (System.getProperty("os.name").contains("Windows")) {
             this.tempfile =  System.getProperty("user.dir") + "arguments.txt";
+            this.exiftool = "exiftool.bat";
         } else {
             this.tempfile =  System.getProperty("user.dir") + this.slash + "arguments.txt";
+            this.exiftool = "exiftool";
         }
         this.fileType = this.getFileType();
         if (this.fileType.equals("JPG") || this.fileType.equals("ARW") || this.fileType.equals("MP4") || this.fileType.equals("DNG")) {

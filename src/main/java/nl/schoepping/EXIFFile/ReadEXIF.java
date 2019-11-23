@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class ReadEXIF {
     final private String regexTimeZone = "^([+-])(\\d{2}):(\\d{2})$";
     final private String regexGPS = "^([\\d.]+) ([NESW])$";
-    final private String exiftool = "exiftool";
+    private String exiftool = "exiftool";
     private Logger logger = null;
     private String mediaFile;
     private String fileType;
@@ -24,6 +24,11 @@ public class ReadEXIF {
     public ReadEXIF(String filePath) throws IOException {
         this.mediaFile = filePath;
         this.fileType = getFileType();
+        if (System.getProperty("os.name").contains("Windows")) {
+            exiftool = "exiftool.bat";
+        } else {
+            exiftool = "exiftool";
+        }
     }
 
     private String getSpaceReplacedFileName() {
