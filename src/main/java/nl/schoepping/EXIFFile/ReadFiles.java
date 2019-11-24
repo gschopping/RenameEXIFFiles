@@ -1,10 +1,9 @@
 package nl.schoepping.EXIFFile;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.*;
 
 public class ReadFiles {
     private final String regexMedia = "^(.*\\.MP4|.*\\.ARW|.*\\.JPG|.*\\.DNG|.*\\.M2TS|.*\\.AVI)$";
@@ -13,9 +12,59 @@ public class ReadFiles {
     private final String regexTimelapsFile = "^(.*\\.ARW|.*\\.JPG|.*\\.DNG)$";
     private String path;
 
+    public class EXIFFile {
+        private File file;
+        private File path;
+        private Double latitude = 0.0;
+        private Double longitude = 0.0;
+        private Date creationDate;
+
+        public File getFile() {
+            return file;
+        }
+
+        public void setFile(File file) {
+            this.file = file;
+        }
+
+        public File getPath() {
+            return path;
+        }
+
+        public void setPath(File path) {
+            this.path = path;
+        }
+
+        public Double getLatitude() {
+            return latitude;
+        }
+
+        public void setLatitude(Double latitude) {
+            this.latitude = latitude;
+        }
+
+        public Double getLongitude() {
+            return longitude;
+        }
+
+        public void setLongitude(Double longitude) {
+            this.longitude = longitude;
+        }
+
+        public Date getCreationDate() {
+            return creationDate;
+        }
+
+        public void setCreationDate(Date creationDate) {
+            this.creationDate = creationDate;
+        }
+    }
+
     public ReadFiles(String path) {
         this.path = path;
     }
+
+
 
     public List<File> getFilesFromDirectory() {
         File dir = new File(this.path);
@@ -88,6 +137,52 @@ public class ReadFiles {
                 result.add(child);
             }
         }
+        return result;
+    }
+
+    public List<EXIFFile> getFiles() throws IOException, ParseException {
+        List<EXIFFile> result = new ArrayList<EXIFFile>();
+
+        Arrays.sort( result.toArray(), (Comparator) (o1, o2) -> ((EXIFFile)o1).getCreationDate().compareTo(((EXIFFile)o2).getCreationDate()));
+
+
+        // read Root files
+        File dir = new File(this.path);
+        File [] files = dir.listFiles();
+        for (File child : files) {
+            if (child.getName().toUpperCase().matches(regexMedia)) {
+                EXIFFile exifFile = new EXIFFile();
+                exifFile.setFile(child);
+                exifFile.setPath(dir);
+                ReadEXIF readEXIF = new ReadEXIF(child.getPath());
+                exifFile.setCreationDate(readEXIF.getCreateDateTime());
+                exifFile.setLatitude(readEXIF.getGPSLatitude());
+                exifFile.setLongitude(readEXIF.getGPSLongitude());
+                result.add(exifFile);
+            }
+        }
+
+        // read Timelapsand GPS files
+        File[] dirs = dir.listFiles(File::isDirectory);
+        for (File child : dirs) {
+            if (child.getName().matches(regexTimelaps) || child.getName().matches(regexGPS)) {
+                File subdir = new File(child.getPath());
+                File[] subfiles = subdir.listFiles();
+                for (File subchild : subfiles) {
+                    if (subchild.getName().toUpperCase().matches(regexTimelapsFile)) {
+                        EXIFFile exifFile = new EXIFFile();
+                        exifFile.setFile(subchild);
+                        exifFile.setPath(subdir);
+                        ReadEXIF readEXIF = new ReadEXIF(subchild.getPath());
+                        exifFile.setCreationDate(readEXIF.getCreateDateTime());
+                        exifFile.setLatitude(readEXIF.getGPSLatitude());
+                        exifFile.setLongitude(readEXIF.getGPSLongitude());
+                        result.add(exifFile);
+                    }
+                }
+            }
+        }
+
         return result;
     }
 

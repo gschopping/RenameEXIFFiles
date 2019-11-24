@@ -35,13 +35,13 @@ public class stepDefinitions {
     // CreateDate feature =========================================================
 
     @Given("File {string}")
-    public void file(String mediaFile) throws ImageProcessingException, IOException, InterruptedException {
+    public void file(String mediaFile) throws IOException, ParseException {
         this.mediaFile = mediaFile;
         this.readEXIF = new ReadEXIF("Z:\\workspace\\resources\\" + this.mediaFile);
     }
 
     @Then("the creationdate is {string}")
-    public void theCreationdateIs(String creationDate) throws IOException, ParseException, InterruptedException {
+    public void theCreationdateIs(String creationDate) throws IOException, ParseException {
         String compareDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.readEXIF.getCreateDateTime());
         Assert.assertEquals(creationDate, compareDate);
     }
@@ -63,7 +63,7 @@ public class stepDefinitions {
     }
 
     @Then("tag {string} should contain {string}")
-    public void tagShouldContain(String tag, String value) throws IOException, InterruptedException {
+    public void tagShouldContain(String tag, String value) throws IOException, ParseException {
         ReadEXIF readEXIF = new ReadEXIF("Z:\\workspace\\resources\\" + this.copyFile);
         String result = readEXIF.getTag(tag);
         Assert.assertEquals(value, result);

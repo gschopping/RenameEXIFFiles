@@ -129,7 +129,6 @@ public class OpenStreetMapUtils {
         con.setRequestProperty("User-Agent", "Rename mediafiles");
 
         if (con.getResponseCode() != 200) {
-            String respnseMessage = con.getResponseMessage();
             return null;
         }
 
