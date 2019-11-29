@@ -10,41 +10,34 @@ import java.util.List;
 import java.util.Locale;
 
 public class WriteEXIF {
-    private String exiftool = "exiftool";
+    private String exiftool;
     private String mediaFile;
-    private String fileType;
     private boolean isWritable;
     private boolean removeOriginal;
     private List<String> arguments;
     private Logger logger = null;
-    private String slash;
-    private String tempfile = "";
+    private String tempfile;
 
     public WriteEXIF(String mediaFile, boolean removeOriginal) throws IOException {
         this.mediaFile = mediaFile;
         this.removeOriginal = removeOriginal;
-        this.slash = System.getProperty("file.separator");
+        String slash = System.getProperty("file.separator");
         if (System.getProperty("os.name").contains("Windows")) {
             this.tempfile =  System.getProperty("user.dir") + "arguments.txt";
             this.exiftool = "exiftool.bat";
         } else {
-            this.tempfile =  System.getProperty("user.dir") + this.slash + "arguments.txt";
+            this.tempfile =  System.getProperty("user.dir") + slash + "arguments.txt";
             this.exiftool = "exiftool";
         }
-        this.fileType = this.getFileType();
-        if (this.fileType.equals("JPG") || this.fileType.equals("ARW") || this.fileType.equals("MP4") || this.fileType.equals("DNG")) {
-            this.isWritable = true;
-        }
-        else {
-            this.isWritable = false;
-        }
-        this.arguments = new ArrayList<String>();
+        String fileType = this.getFileType();
+        this.isWritable = fileType.equals("JPG") || fileType.equals("ARW") || fileType.equals("MP4") || fileType.equals("DNG");
+        this.arguments = new ArrayList<>();
         if (removeOriginal) {
             this.arguments.add("-overwrite_original");
         }
     }
 
-    public void setLogger(Logger logger) {
+    void setLogger(Logger logger) {
         this.logger = logger;
     }
 
@@ -85,13 +78,13 @@ public class WriteEXIF {
         return fileType;
     }
 
-    private void writeTag(String[] tags, String value) throws IOException {
+    private void writeTag(String[] tags, String value) {
         for (String tag : tags) {
             this.arguments.add("-" + tag + "=" + value);
         }
     }
 
-    private void writeKeys(String[] tags, String[] values) throws IOException {
+    private void writeKeys(String[] tags, String[] values) {
         for (String value : values) {
             for (String tag : tags) {
                 this.arguments.add("-" + tag + "=" + value);
@@ -119,21 +112,25 @@ public class WriteEXIF {
                 logger.debug("WriteEXIF: writeFile " + Arrays.toString(cmdString));
             }
             Process process = Runtime.getRuntime().exec(cmdString);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            // read result first line
-            result = reader.readLine();
-            if (logger != null) {
-                logger.debug("WriteEXIF: writeFile " + result);
+            if (process == null) {
+                throw new IOException("Can't execute " + Arrays.toString(cmdString));
             }
-            if ((result != null) && (! result.matches("\\s*1 image files (created|updated)"))) {
-                // maybe correct answer on second line
-                result = reader.readLine();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            // read result lines, if any contains files is updated then continue
+            boolean fileIsUpdated = false;
+            result = reader.readLine();
+            while (result != null) {
                 if (logger != null) {
                     logger.debug("WriteEXIF: writeFile " + result);
                 }
-                if ((result != null) && (! result.matches( "\\s*1 image files (created|updated)"))) {
-                    throw new IOException("Update of file " + writeFile + " failed");
+                if (result.matches("\\s*1 image files (created|updated)")) {
+                    fileIsUpdated = true;
+                    break;
                 }
+                result = reader.readLine();
+            }
+            if (! fileIsUpdated) {
+                throw new IOException("Update of file " + writeFile + " failed");
             }
             reader.close();
         }
@@ -147,7 +144,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setAuthor(String author) throws IOException {
+    public void setAuthor(String author) {
         if (! author.isEmpty()) {
             String[] tags = new String[6];
             tags[0] = "EXIF:Artist";
@@ -160,7 +157,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setCopyright(String copyright) throws IOException {
+    void setCopyright(String copyright) {
         if (! copyright.isEmpty()) {
             String[] tags = new String[3];
             tags[0] = "EXIF:Copyright";
@@ -170,7 +167,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setComment(String comment) throws IOException {
+    void setComment(String comment) {
         if (! comment.isEmpty()) {
             String[] tags = new String[2];
             tags[0] = "EXIF:UserComment";
@@ -179,7 +176,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setCountryCode(String countryCode) throws IOException {
+    void setCountryCode(String countryCode) {
         if (! countryCode.isEmpty()) {
             String[] tags = new String[1];
             tags[0] = "XMP:CountryCode";
@@ -189,7 +186,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setCountry(String country) throws IOException {
+    public void setCountry(String country) {
         if (! country.isEmpty()) {
             String[] tags = new String[2];
             tags[0] = "XMP:Country";
@@ -198,7 +195,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setProvince(String province) throws IOException {
+    void setProvince(String province) {
         if (! province.isEmpty()) {
             String[] tags = new String[2];
             tags[0] = "XMP:State";
@@ -207,7 +204,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setCity(String city) throws IOException {
+    public void setCity(String city) {
         if (! city.isEmpty()) {
             String[] tags = new String[1];
             tags[0] = "XMP:City";
@@ -215,7 +212,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setLocation(String location) throws IOException {
+    void setLocation(String location) {
         if (! location.isEmpty()) {
             String[] tags = new String[2];
             tags[0] = "IPTC:Sub-location";
@@ -224,7 +221,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setTitle(String title) throws IOException {
+    public void setTitle(String title) {
         if (! title.isEmpty()) {
             String[] tags = new String[4];
             tags[0] = "XMP:Title";
@@ -235,7 +232,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setURL(String url) throws IOException {
+    void setURL(String url) {
         if (! url.isEmpty()) {
             String[] tags = new String[2];
             tags[0] = "XMP:BaseURL";
@@ -244,7 +241,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setDescription(String description) throws IOException {
+    void setDescription(String description) {
         if (! description.isEmpty()) {
             String[] tags = new String[3];
             tags[0] = "XMP:Headline";
@@ -254,7 +251,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setKeys(String[] keys) throws IOException {
+    public void setKeys(String[] keys) {
         if (keys.length > 0) {
             String[] tags = new String[4];
             tags[0] = "XMP:Subject";
@@ -267,16 +264,14 @@ public class WriteEXIF {
             for (String key : keys) {
                 if (value.isEmpty()) {
                     value = key;
-                } else {
-                    value = value + ", " + key;
-                }
+                } else value = value.concat(", " + key);
             }
             tags2[0] = "EXIF:XPKeywords";
             writeTag(tags2, value);
         }
     }
 
-    public void setSpecialInstructions(String specialInstructions) throws IOException {
+    void setSpecialInstructions(String specialInstructions) {
         if (! specialInstructions.isEmpty()) {
             String[] tags = new String[2];
             tags[0] = "IPTC:SpecialInstructions";
@@ -285,7 +280,7 @@ public class WriteEXIF {
         }
     }
 
-    public void setAddress(OpenStreetMapUtils.Address address) throws IOException {
+    public void setAddress(OpenStreetMapUtils.Address address) {
         setCountryCode(address.getCountrycode());
         setCountry(address.getCountry());
         setCity(address.getCity());
