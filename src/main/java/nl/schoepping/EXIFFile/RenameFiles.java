@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.List;
 
 public class RenameFiles {
+    final private String regexASCII = "^([a-zA-Z0-9_\\-\\(\\)@#!= \\[\\]{};,.<>]+)$";
     private Logger logger;
     private String startDirectory;
     private String configFile;
@@ -17,6 +18,20 @@ public class RenameFiles {
         this.startDirectory = startDirectory;
         this.configFile = configFile;
         this.slash = System.getProperty("file.separator");
+    }
+
+    private String getTitle(String title, String location, String city, String country) {
+        String result = country;
+        if (title.matches(regexASCII)) {
+            result = title;
+        }
+        else if (location.matches(regexASCII)) {
+            result = location;
+        }
+        else if (city.matches(regexASCII)) {
+            result = city;
+        }
+        return result;
     }
 
     private void RenameFile(OpenStreetMapUtils.Address address, ReadYaml.TimeLine timeline, String dateString, String directory, int counter, File file, boolean fromTimeline) throws Exception {
@@ -60,6 +75,8 @@ public class RenameFiles {
             writeEXIF.setKeys(keys);
         }
         boolean noError = false;
+        // to avoid non ASCII characters in the filename
+        title = getTitle(title, location, city, country);
         String newFileName = "";
         while (! noError) {
             if (postfix == ' ') {
