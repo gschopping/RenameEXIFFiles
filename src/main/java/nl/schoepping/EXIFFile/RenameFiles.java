@@ -51,16 +51,13 @@ public class RenameFiles {
         writeEXIF.setCopyright(timeline.getCopyright());
         writeEXIF.setAuthor(timeline.getAuthor());
         writeEXIF.setURL(timeline.getWebsite());
+        writeEXIF.setTitle(title);
         if (fromTimeline) {
-            writeEXIF.setTitle(timeline.getTitle());
             writeEXIF.setDescription(timeline.getDescription());
             writeEXIF.setComment(timeline.getComment());
             writeEXIF.setSpecialInstructions(timeline.getInstructions());
             String[] keys = timeline.getKeys().split(",");
             writeEXIF.setKeys(keys);
-        }
-        else {
-            writeEXIF.setTitle(title);
         }
         boolean noError = false;
         String newFileName = "";

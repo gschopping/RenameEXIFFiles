@@ -114,7 +114,7 @@ public class WriteEXIF {
             writeArguments();
             // Before copting first delete original file
 
-            String[] cmdString = new String[] { exiftool, "-m", "-@", tempfile, getSpaceReplacedFileName(), "-o",  replaceSpaces(writeFile) };
+            String[] cmdString = new String[] { exiftool, "-m", "-charset", "FileName=UTF8", "-@", tempfile, getSpaceReplacedFileName(), "-o",  replaceSpaces(writeFile) };
             if (logger != null) {
                 logger.debug("WriteEXIF: writeFile " + Arrays.toString(cmdString));
             }
