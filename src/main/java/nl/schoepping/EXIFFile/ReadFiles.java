@@ -12,7 +12,7 @@ public class ReadFiles {
     private final String regexTimelapsFile = "^(.*\\.ARW|.*\\.JPG|.*\\.DNG)$";
     private String path;
 
-    public class EXIFFile {
+    public static class EXIFFile {
         private File file;
         private File path;
         private Double latitude = 0.0;

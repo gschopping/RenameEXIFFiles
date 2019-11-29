@@ -6,7 +6,7 @@ import org.apache.log4j.PropertyConfigurator;
 
 public class RenameEXIFFiles {
 
-    static Logger log = Logger.getLogger("RenameEXIFFiles");
+    private static Logger log = Logger.getLogger("RenameEXIFFiles");
 
     public static void main(String[] args) {
 

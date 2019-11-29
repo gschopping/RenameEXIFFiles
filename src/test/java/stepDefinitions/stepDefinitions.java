@@ -1,8 +1,10 @@
 package stepDefinitions;
 
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import nl.schoepping.EXIFFile.*;
-import com.drew.imaging.ImageProcessingException;
-import io.cucumber.java.en.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Assert;
@@ -13,8 +15,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
-import static org.hamcrest.Matchers.matchesPattern;
 
 public class stepDefinitions {
     private String mediaFile;
@@ -41,7 +41,7 @@ public class stepDefinitions {
     }
 
     @Then("the creationdate is {string}")
-    public void theCreationdateIs(String creationDate) throws IOException, ParseException {
+    public void theCreationdateIs(String creationDate) {
         String compareDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.readEXIF.getCreateDateTime());
         Assert.assertEquals(creationDate, compareDate);
     }
@@ -100,7 +100,7 @@ public class stepDefinitions {
     }
 
     @When("write Title {string} but not delete existing file")
-    public void writeTitleButNotDeleteExistingFile(String title) throws IOException, ParseException, InterruptedException {
+    public void writeTitleButNotDeleteExistingFile(String title) throws Exception {
         WriteEXIF writeEXIF = new WriteEXIF("Z:\\workspace\\resources\\" + this.mediaFile, false);
         writeEXIF.setTitle(title);
         char postfix = ' ';
@@ -150,17 +150,17 @@ public class stepDefinitions {
     // GPS Tags feature =========================================================
 
     @Then("latitude should be {string}")
-    public void latitudeShouldBe(String latitude) throws IOException {
+    public void latitudeShouldBe(String latitude) {
         Assert.assertEquals(latitude, this.latitude.toString());
     }
 
     @And("longitude should be {string}")
-    public void longitudeShouldBe(String longitude) throws IOException {
+    public void longitudeShouldBe(String longitude) {
         Assert.assertEquals(longitude, this.longitude.toString());
     }
 
     @And("street should be {string}")
-    public void streetShouldBe(String street) throws IOException {
+    public void streetShouldBe(String street) {
         if (address != null) {
             Assert.assertEquals(street, address.getStreet());
         } else {
@@ -187,7 +187,7 @@ public class stepDefinitions {
     }
 
     @When("read GPS tags")
-    public void readGPSTags() throws IOException {
+    public void readGPSTags() {
         this.longitude = readEXIF.getGPSLongitude();
         this.latitude = readEXIF.getGPSLatitude();
         this.address = OpenStreetMapUtils.getInstance().getAddress(this.latitude, this.longitude);
@@ -321,9 +321,12 @@ public class stepDefinitions {
     }
 
     @Then("in subdirectory {string} {int} files will be found")
-    public void inSubdirectoryFilesWillBeFound(String subdir, int count) throws IOException {
+    public void inSubdirectoryFilesWillBeFound(String subdir, int count) {
         File dir = new File(subdir);
         File[] files = dir.listFiles();
+        if (files == null) {
+            Assert.fail();
+        }
         int nrOfFiles = files.length;
         Assert.assertEquals(count, nrOfFiles);
     }
@@ -344,6 +347,9 @@ public class stepDefinitions {
     public void inSubdirectoryFileWillBeFound(String subdir, String fileName) {
         File dir = new File(subdir);
         File[] files = dir.listFiles();
+        if (files == null) {
+            Assert.fail();
+        }
         Assert.assertEquals(fileName, files[0].getName());
     }
 
