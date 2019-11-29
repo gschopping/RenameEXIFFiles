@@ -1,6 +1,5 @@
 package nl.schoepping.EXIFFile;
 
-//import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -22,29 +21,29 @@ public class OpenStreetMapUtils {
         private String street = "";
         private String address = "";
 
-        public String getCountrycode() {
+        String getCountrycode() {
             return countrycode;
         }
 
-        public void setCountrycode(String countrycode) {
+        void setCountrycode(String countrycode) {
             this.isSet = true;
             this.countrycode = countrycode.toUpperCase();
         }
 
-        public String getCountry() {
+        String getCountry() {
             return country;
         }
 
-        public void setCountry(String country) {
+        void setCountry(String country) {
             this.isSet = true;
             this.country = country;
         }
 
-        public String getProvince() {
+        String getProvince() {
             return province;
         }
 
-        public void setProvince(String province) {
+        void setProvince(String province) {
             this.isSet = true;
             this.province = province;
         }
@@ -53,7 +52,7 @@ public class OpenStreetMapUtils {
             return city;
         }
 
-        public void setCity(String city) {
+        void setCity(String city) {
             this.isSet = true;
             this.city = city;
         }
@@ -62,7 +61,7 @@ public class OpenStreetMapUtils {
             return location;
         }
 
-        public void setLocation(String location) {
+        void setLocation(String location) {
             this.isSet = true;
             this.location = location;
         }
@@ -71,7 +70,7 @@ public class OpenStreetMapUtils {
             return postcode;
         }
 
-        public void setPostcode(String postcode) {
+        void setPostcode(String postcode) {
             this.isSet = true;
             this.postcode = postcode;
         }
@@ -80,7 +79,7 @@ public class OpenStreetMapUtils {
             return street;
         }
 
-        public void setStreet(String street) {
+        void setStreet(String street) {
             this.isSet = true;
             this.street = street;
         }
@@ -89,19 +88,19 @@ public class OpenStreetMapUtils {
             return address;
         }
 
-        public void setAddress(String address) {
+        void setAddress(String address) {
             this.isSet = true;
             this.address = address;
         }
 
-        public boolean getIsSet() {
+        boolean getIsSet() {
             return isSet;
         }
     }
 
     private static OpenStreetMapUtils instance = null;
 
-    public OpenStreetMapUtils() {
+    private OpenStreetMapUtils() {
 
     }
 
@@ -134,7 +133,7 @@ public class OpenStreetMapUtils {
 
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
         String inputLine;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
 
         while ((inputLine = in.readLine()) != null) {
             response.append(inputLine);
@@ -187,7 +186,7 @@ public class OpenStreetMapUtils {
         }
 
         JSONObject jObject = new JSONObject(queryResult);
-        String result = "";
+        String result;
         try {
             String displayName = jObject.getString("display_name");
             address.setAddress(displayName);

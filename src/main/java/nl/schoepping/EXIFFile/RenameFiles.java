@@ -7,7 +7,6 @@ import java.io.File;
 import java.util.List;
 
 public class RenameFiles {
-    final private String regexASCII = "^([a-zA-Z0-9_\\-\\(\\)@#!= \\[\\]{};,.<>]+)$";
     private Logger logger;
     private String startDirectory;
     private String configFile;
@@ -22,6 +21,7 @@ public class RenameFiles {
 
     private String getTitle(String title, String location, String city, String country) {
         String result = country;
+        String regexASCII = "^([a-zA-Z0-9_\\-()@#!= \\[\\]{};,.<>]+)$";
         if (title.matches(regexASCII)) {
             result = title;
         }
@@ -36,10 +36,10 @@ public class RenameFiles {
 
     private void RenameFile(OpenStreetMapUtils.Address address, ReadYaml.TimeLine timeline, String dateString, String directory, int counter, File file, boolean fromTimeline) throws Exception {
         char postfix=' ';
-        String title = "";
-        String country = "";
-        String city = "";
-        String location = "";
+        String title;
+        String country;
+        String city;
+        String location;
         // write all tags
         this.logger.debug("RenameFiles: RenameFile " + file.getPath());
         WriteEXIF writeEXIF = new WriteEXIF(file.getPath(), true);
@@ -77,7 +77,7 @@ public class RenameFiles {
         boolean noError = false;
         // to avoid non ASCII characters in the filename
         title = getTitle(title, location, city, country);
-        String newFileName = "";
+        String newFileName;
         while (! noError) {
             if (postfix == ' ') {
                 if (counter > 0) {
@@ -145,7 +145,6 @@ public class RenameFiles {
         for (File file : readFiles.getFilesFromDirectory()) {
             this.logger.debug("RenameRootFiles: ReadEXIF " + file.getPath());
             ReadEXIF readEXIF = new ReadEXIF(file.getPath());
-            readEXIF.setLogger(this.logger);
 // timeline is found, now you can set all information in mediafile
 // create new name for mediafile
             this.logger.debug("RenameRootFiles: ReadEXIF");
@@ -197,7 +196,6 @@ public class RenameFiles {
                 File file = timelapsFiles.get(timelapsFiles.size() - 1);
                 this.logger.debug("RenameTimelapsFiles: ReadEXIF " + file.getPath());
                 ReadEXIF readEXIF = new ReadEXIF(file.getPath());
-                readEXIF.setLogger(this.logger);
                 this.logger.debug("RenameTimelapsFiles: ReadEXIF " + readEXIF.getCreateDateTimeString());
                 // start counter for each new date, keep all filenames unique
                 if (referenceDate.isEmpty()) {

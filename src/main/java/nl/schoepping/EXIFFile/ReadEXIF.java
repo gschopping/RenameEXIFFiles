@@ -1,13 +1,13 @@
 package nl.schoepping.EXIFFile;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,41 +16,36 @@ import java.util.regex.Pattern;
 
 
 public class ReadEXIF {
-    final private String regexTimeZone = "^([+-])(\\d{2}):(\\d{2})$";
-    final private String regexGPS = "^([\\d.]+) ([NESW])$";
-    final private String regexEXIF = "^(\\S+)(\\s*): (.+)$";
-    private String exiftool = "exiftool";
-    private Logger logger = null;
+    private String exiftool;
     private String mediaFile;
-    private String fileType;
-    private EXIFInfo exifInfo = null;
+    private EXIFInfo exifInfo;
 
-    public class EXIFInfo {
+    public static class EXIFInfo {
         private Date CreationDate = null;
         private Double Latitude = 0.0;
         private Double Longitude = 0.0;
 
-        public Date getCreationDate() {
+        Date getCreationDate() {
             return CreationDate;
         }
 
-        public void setCreationDate(Date creationDate) {
+        void setCreationDate(Date creationDate) {
             CreationDate = creationDate;
         }
 
-        public Double getLatitude() {
+        Double getLatitude() {
             return Latitude;
         }
 
-        public void setLatitude(Double latitude) {
+        void setLatitude(Double latitude) {
             Latitude = latitude;
         }
 
-        public Double getLongitude() {
+        Double getLongitude() {
             return Longitude;
         }
 
-        public void setLongitude(Double longitude) {
+        void setLongitude(Double longitude) {
             Longitude = longitude;
         }
     }
@@ -77,99 +72,113 @@ public class ReadEXIF {
         return result;
     }
 
-    public void setLogger(Logger logger) {
-        this.logger = logger;
-    }
-
     private EXIFInfo getEXIFInfo() throws IOException, ParseException {
         EXIFInfo result = new EXIFInfo();
-        Map<String, String> map = new HashMap<String, String>();
-        Process process = null;
+        Map<String, String> map = new HashMap<>();
         BufferedReader reader;
         String[] cmdString = new String[] { exiftool,
                 "-s1",
-                "-DateTimeOriginal", "-CreateDate", "-FileModifyDate",
+                "-DateTimeOriginal", "-CreateDate", "-FileModifyDate", "-GPSDateTime",
                 "-TimeZone",
                 "-FileType",
                 "-c", "%.6f", "-GPSLatitude", "-GPSLongitude",
                 getSpaceReplacedFileName() };
-        process = Runtime.getRuntime().exec(cmdString);
-        if (process != null) {
-            reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = reader.readLine();
-            while (line != null) {
-                Pattern pattern = Pattern.compile(regexEXIF);
-                Matcher matcher = pattern.matcher(line);
-                if (matcher.matches()) {
-                    map.put(matcher.group(1),matcher.group(3));
-                }
-                line = reader.readLine();
+        Process process = Runtime.getRuntime().exec(cmdString);
+        if (process == null) {
+            throw new IOException("Can't execute " + Arrays.toString(cmdString));
+        }
+        reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line = reader.readLine();
+        while (line != null) {
+            String regexEXIF = "^(\\S+)(\\s*): (.+)$";
+            Pattern pattern = Pattern.compile(regexEXIF);
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.matches()) {
+                map.put(matcher.group(1),matcher.group(3));
             }
-            reader.close();
+            line = reader.readLine();
+        }
+        reader.close();
 
-            // Read creationdate
-            String dateString = "";
-            String timeZone = "+00:00";
-            if (map.get("FileType").equals("JPEG")) {
+        // Read creationdate
+        String dateString = null;
+        String timeZone = "+00:00";
+        switch (map.get("FileType")) {
+            case "JPEG":
                 dateString = map.get("DateTimeOriginal");
-            } else if (map.get("FileType").equals("ARW")) {
+                break;
+            case "ARW":
                 dateString = map.get("DateTimeOriginal");
-            } else if (map.get("FileType").equals("DNG")) {
+                break;
+            case "DNG":
                 dateString = map.get("DateTimeOriginal");
-            } else if (map.get("FileType").equals("MP4")) {
+                break;
+            case "MP4":
                 dateString = map.get("CreateDate");
                 timeZone = map.get("TimeZone");
                 if (timeZone == null) {
                     timeZone = "+00:00";
                 }
-            } else if (map.get("FileType").equals("M2TS")) {
+                break;
+            case "M2TS":
                 dateString = map.get("DateTimeOriginal");
-            } else if (map.get("FileType").equals("AVI")) {
+                break;
+            case "AVI":
+                dateString = map.get("FileModifyDate");
+                break;
+        }
+        // if dateString is still empty then try another tag
+        if (dateString == null) {
+            dateString = map.get("GPSDateTime");
+            if (dateString == null) {
                 dateString = map.get("FileModifyDate");
             }
-            if ((dateString != null) && (! dateString.isEmpty())) {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-                Date date = simpleDateFormat.parse(dateString);
-                Pattern pattern = Pattern.compile(regexTimeZone);
-                Matcher matcher = pattern.matcher(timeZone);
-                int hours = 0;
-                int minutes = 0;
-                if (matcher.matches()) {
-                    String sign = matcher.group(1);
-                    hours = Integer.parseInt(matcher.group(2));
-                    if (sign.equals("-")) {
-                        hours = -1 * hours;
-                    }
-                    minutes = Integer.parseInt(matcher.group(3));
+        }
+
+        if (dateString != null) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+            Date date = simpleDateFormat.parse(dateString);
+            String regexTimeZone = "^([+-])(\\d{2}):(\\d{2})$";
+            Pattern pattern = Pattern.compile(regexTimeZone);
+            Matcher matcher = pattern.matcher(timeZone);
+            int hours = 0;
+            int minutes = 0;
+            if (matcher.matches()) {
+                String sign = matcher.group(1);
+                hours = Integer.parseInt(matcher.group(2));
+                if (sign.equals("-")) {
+                    hours = -1 * hours;
                 }
-                date = DateUtils.addHours(date, hours);
-                result.setCreationDate(DateUtils.addMinutes(date, minutes));
+                minutes = Integer.parseInt(matcher.group(3));
             }
+            date = DateUtils.addHours(date, hours);
+            result.setCreationDate(DateUtils.addMinutes(date, minutes));
+        }
 
-            // read GPS data
+        // read GPS data
 
-            String latitudeString = map.get("GPSLatitude");
-            String longitudeString = map.get("GPSLongitude");
-            if ((latitudeString != null) && (longitudeString != null)) {
-                double latitude = 0.0;
-                double longitude = 0.0;
-                Pattern pattern = Pattern.compile(regexGPS);
-                Matcher matcher = pattern.matcher(latitudeString);
-                if (matcher.matches()) {
-                    latitude = Double.parseDouble(matcher.group(1));
-                    if (matcher.group(2).equals("S")) {
-                        latitude = latitude * -1;
-                    }
-                    result.setLatitude(latitude);
+        String latitudeString = map.get("GPSLatitude");
+        String longitudeString = map.get("GPSLongitude");
+        if ((latitudeString != null) && (longitudeString != null)) {
+            double latitude;
+            double longitude;
+            String regexGPS = "^([\\d.]+) ([NESW])$";
+            Pattern pattern = Pattern.compile(regexGPS);
+            Matcher matcher = pattern.matcher(latitudeString);
+            if (matcher.matches()) {
+                latitude = Double.parseDouble(matcher.group(1));
+                if (matcher.group(2).equals("S")) {
+                    latitude = latitude * -1;
                 }
-                matcher = pattern.matcher(longitudeString);
-                if (matcher.matches()) {
-                    longitude = Double.parseDouble(matcher.group(1));
-                    if (matcher.group(2).equals("S")) {
-                        longitude = longitude * -1;
-                    }
-                    result.setLongitude(longitude);
+                result.setLatitude(latitude);
+            }
+            matcher = pattern.matcher(longitudeString);
+            if (matcher.matches()) {
+                longitude = Double.parseDouble(matcher.group(1));
+                if (matcher.group(2).equals("S")) {
+                    longitude = longitude * -1;
                 }
+                result.setLongitude(longitude);
             }
         }
         return result;
@@ -203,11 +212,17 @@ public class ReadEXIF {
         return this.exifInfo.getLongitude();
     }
 
-    public String getCreateDateTimeString() throws IOException, ParseException, InterruptedException {
+    public String getCreateDateTimeString() throws Exception {
+        if (this.getCreateDateTime() == null) {
+            throw new Exception("No creation date is found");
+        }
         return new SimpleDateFormat("yyyyMMdd-HHmmss").format(this.getCreateDateTime());
     }
 
-    public String getCreateDateString() throws IOException, ParseException, InterruptedException {
+    String getCreateDateString() throws Exception {
+        if (this.getCreateDateTime() == null) {
+            throw new Exception("No creation date is found");
+        }
         return new SimpleDateFormat("yyyyMMdd").format(this.getCreateDateTime());
     }
 

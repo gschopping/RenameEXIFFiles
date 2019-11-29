@@ -12,11 +12,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReadYaml {
-    private final String regexParser = "line (\\d+), column (\\d+):\n^(\\s*)(.+)$";
-    private final String regexDateParser = "^Unparseable date: \"(.+)\"$";
     private List<TimeLine> timeLines;
 
-    public class TimeLine {
+    public static class TimeLine {
         private Date startdate = null;
         private Date enddate = null;
         private String title = "";
@@ -39,11 +37,11 @@ public class ReadYaml {
 
         public Date getEnddate() { return enddate; }
 
-        public String getTitle() {
+        String getTitle() {
             return title;
         }
 
-        public String getCountrycode() {
+        String getCountrycode() {
             return countrycode;
         }
 
@@ -56,15 +54,15 @@ public class ReadYaml {
             }
         }
 
-        public String getProvince() {
+        String getProvince() {
             return province;
         }
 
-        public String getCity() {
+        String getCity() {
             return city;
         }
 
-        public String getLocation() {
+        String getLocation() {
             return location;
         }
 
@@ -72,11 +70,11 @@ public class ReadYaml {
             return description;
         }
 
-        public String getAuthor() {
+        String getAuthor() {
             return author;
         }
 
-        public String getWebsite() {
+        String getWebsite() {
             return website;
         }
 
@@ -84,33 +82,32 @@ public class ReadYaml {
             return copyright;
         }
 
-        public String getComment() {
+        String getComment() {
             return comment;
         }
 
-        public String getKeys() {
+        String getKeys() {
             return keys;
         }
 
-        public String getInstructions() {
+        String getInstructions() {
             return instructions;
         }
 
-        public void setStartdate(String startdate) throws ParseException {
+        void setStartdate(String startdate) throws ParseException {
             this.startdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startdate);
         }
 
-        public void setEnddate(Date enddate) {
+        void setEnddate(Date enddate) {
 
             this.enddate = enddate;
-            ;
         }
 
-        public void setTitle(String title) {
+        void setTitle(String title) {
             this.title = title;
         }
 
-        public void setCountrycode(String countrycode) throws Exception {
+        void setCountrycode(String countrycode) throws Exception {
             Locale obj = new Locale("", countrycode);
             try {
                 String code = obj.getISO3Country();
@@ -121,52 +118,52 @@ public class ReadYaml {
             this.countrycode = obj.getCountry();
         }
 
-        public void setCountry(String country) {
+        void setCountry(String country) {
             this.country = country;
         }
 
-        public void setProvince(String province) {
+        void setProvince(String province) {
             this.province = province;
         }
 
-        public void setCity(String city) {
+        void setCity(String city) {
             this.city = city;
         }
 
-        public void setLocation(String location) {
+        void setLocation(String location) {
             this.location = location;
         }
 
-        public void setDescription(String description) {
+        void setDescription(String description) {
             this.description = description;
         }
 
-        public void setAuthor(String author) {
+        void setAuthor(String author) {
             this.author = author;
         }
 
-        public void setWebsite(String website) {
+        void setWebsite(String website) {
             this.website = website;
         }
 
-        public void setCopyRight(String copyright) {
+        void setCopyRight(String copyright) {
             this.copyright = copyright;
         }
 
-        public void setComment(String comment) {
+        void setComment(String comment) {
             this.comment = comment;
         }
 
-        public void setKeys(String keys) {
+        void setKeys(String keys) {
             this.keys = keys;
         }
 
-        public void setInstructions(String instructions) {
+        void setInstructions(String instructions) {
             this.instructions = instructions;
         }
     }
 
-    class SortbyDate implements Comparator<TimeLine> {
+    static class SortbyDate implements Comparator<TimeLine> {
         @Override
         public int compare(TimeLine o1, TimeLine o2) {
             return o1.getStartdate().compareTo(o2.getStartdate());
@@ -176,7 +173,7 @@ public class ReadYaml {
 
     public ReadYaml(String configFile) throws Exception {
 //        this.errorMessages = new ArrayList<String>();
-        this.timeLines = new ArrayList<TimeLine> ();
+        this.timeLines = new ArrayList<>();
         int lineCount = 0;
         try {
             InputStream input = new FileInputStream(new File(configFile));
@@ -192,6 +189,7 @@ public class ReadYaml {
         }
         catch (Exception e) {
             String errorType = e.getClass().getName();
+            String regexParser = "line (\\d+), column (\\d+):\n^(\\s*)(.+)$";
             if (errorType.equals("org.yaml.snakeyaml.parser.ParserException")) {
                 Pattern pattern = Pattern.compile(regexParser, Pattern.MULTILINE);
                 Matcher matcher = pattern.matcher(e.getMessage());
@@ -209,6 +207,7 @@ public class ReadYaml {
                 throw new Exception(String.format("%s not found",configFile));
             }
             else if (errorType.equals("java.text.ParseException")) {
+                String regexDateParser = "^Unparseable date: \"(.+)\"$";
                 Pattern pattern = Pattern.compile(regexDateParser);
                 Matcher matcher = pattern.matcher(e.getMessage());
                 String sentence = "";
@@ -241,7 +240,7 @@ public class ReadYaml {
 
     private void setTimeLine(Map item) throws Exception {
         TimeLine timeline = new TimeLine();
-        String value = "";
+        String value;
         if (item.get("countrycode") != null) {
             value = (String) item.get("countrycode");
             timeline.setCountrycode(value);
@@ -324,7 +323,7 @@ public class ReadYaml {
     }
 
     public List<TimeLine> getTimeLines() {
-        Collections.sort(this.timeLines, new SortbyDate());
+        this.timeLines.sort(new SortbyDate());
         setEnddate();
         return this.timeLines;
     }
