@@ -155,7 +155,14 @@ public class RenameFiles {
                 Double latitude = readEXIF.getGPSLatitude();
                 Double longitude = readEXIF.getGPSLongitude();
                 OpenStreetMapUtils.Address address = OpenStreetMapUtils.getInstance().getAddress(latitude, longitude);
-                RenameFile(address, timeline, dateString, this.startDirectory, 0, file, true);
+                try {
+                    RenameFile(address, timeline, dateString, this.startDirectory, 0, file, true);
+                }
+                catch (Exception e){
+                    if (logger != null) {
+                        this.logger.info(String.format("RenameRootFiles %s", e.getMessage()));
+                    }
+                }
             } else {
                 if (logger != null) {
                     this.logger.info(String.format("%s with %tF %tT has a creationdate before all timelines",

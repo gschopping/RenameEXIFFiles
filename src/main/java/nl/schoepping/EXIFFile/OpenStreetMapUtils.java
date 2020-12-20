@@ -187,6 +187,8 @@ public class OpenStreetMapUtils {
 
         JSONObject jObject = new JSONObject(queryResult);
         String result;
+
+//      display name
         try {
             String displayName = jObject.getString("display_name");
             address.setAddress(displayName);
@@ -194,6 +196,8 @@ public class OpenStreetMapUtils {
             address.setAddress("");
         }
         JSONObject jsonObject = jObject.getJSONObject("address");
+
+//        Street: road, footway, parking
         try {
             result = jsonObject.getString("road");
             address.setStreet(result);
@@ -210,12 +214,36 @@ public class OpenStreetMapUtils {
                 }
             }
         }
+
+//        Location: suburb, neighbourhood, city_district, district, quarter
         try {
             result = jsonObject.getString("suburb");
             address.setLocation(result);
         } catch (Exception e) {
-            address.setLocation("");
+            try {
+                result = jsonObject.getString("neighbourhood");
+                address.setLocation(result);
+            } catch (Exception f) {
+                try {
+                    result = jsonObject.getString("city_district");
+                    address.setLocation(result);
+                } catch (Exception g) {
+                    try {
+                        result = jsonObject.getString("quarter");
+                        address.setLocation(result);
+                    } catch (Exception h) {
+                        try {
+                            result = jsonObject.getString("district");
+                            address.setLocation(result);
+                        } catch (Exception k) {
+                            address.setLocation("");
+                        }
+                    }
+                }
+            }
         }
+
+//        City: town, city, village
         try {
             result = jsonObject.getString("town");
             address.setCity(result);
@@ -232,24 +260,32 @@ public class OpenStreetMapUtils {
                 }
             }
         }
+
+//        Province: state
         try {
             result = jsonObject.getString("state");
             address.setProvince(result);
         } catch (Exception e) {
             address.setProvince("");
         }
+
+//        Postcode: postcode
         try {
             result = jsonObject.getString("postcode");
             address.setPostcode(result);
         } catch (Exception e) {
             address.setPostcode("");
         }
+
+//        Country
         try {
             result = jsonObject.getString("country");
             address.setCountry(result);
         } catch (Exception e) {
             address.setCountry("");
         }
+
+//        Countrycode
         try {
             result = jsonObject.getString("country_code");
             address.setCountrycode(result);

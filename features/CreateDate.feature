@@ -28,5 +28,10 @@ Feature: Unittest CreateDate
     Given File "SonyA6300.AVI"
     Then the creationdate is "2019-08-30 22:42:25"
 
+  Scenario: Read data from JPEG without DateTimeOriginal file
+    Given File "OnePlus2_nodate.jpg"
+    Then the creationdate is "2016-08-19 12:07:47"
+
+
 
 
