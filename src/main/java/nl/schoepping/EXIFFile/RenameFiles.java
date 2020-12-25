@@ -141,35 +141,36 @@ public class RenameFiles {
         this.logger.debug("RenameRootFiles: ReadYaml " + configFile);
         ReadYaml readYaml = new ReadYaml(configFile);
         this.logger.debug("RenameRootFiles: ReadFiles " + startDirectory);
-        ReadFiles readFiles = new ReadFiles(this.startDirectory);
-        for (File file : readFiles.getFilesFromDirectory()) {
-            this.logger.debug("RenameRootFiles: ReadEXIF " + file.getPath());
-            ReadEXIF readEXIF = new ReadEXIF(file.getPath());
+        if (readYaml.getEnabled()) {
+            ReadFiles readFiles = new ReadFiles(this.startDirectory);
+            for (File file : readFiles.getFilesFromDirectory()) {
+                this.logger.debug("RenameRootFiles: ReadEXIF " + file.getPath());
+                ReadEXIF readEXIF = new ReadEXIF(file.getPath());
 // timeline is found, now you can set all information in mediafile
 // create new name for mediafile
-            this.logger.debug("RenameRootFiles: ReadEXIF");
-            this.logger.debug("RenameRootFiles: ReadYaml.getTimeLine " + readEXIF.getCreateDateTimeString());
-            ReadYaml.TimeLine timeline = readYaml.getTimeLine(readEXIF.getCreateDateTime());
-            if (timeline != null) {
-                String dateString = readEXIF.getCreateDateTimeString();
-                Double latitude = readEXIF.getGPSLatitude();
-                Double longitude = readEXIF.getGPSLongitude();
-                OpenStreetMapUtils.Address address = OpenStreetMapUtils.getInstance().getAddress(latitude, longitude);
-                try {
-                    RenameFile(address, timeline, dateString, this.startDirectory, 0, file, true);
-                }
-                catch (Exception e){
-                    if (logger != null) {
-                        this.logger.info(String.format("RenameRootFiles %s", e.getMessage()));
+                this.logger.debug("RenameRootFiles: ReadEXIF");
+                this.logger.debug("RenameRootFiles: ReadYaml.getTimeLine " + readEXIF.getCreateDateTimeString());
+                ReadYaml.TimeLine timeline = readYaml.getTimeLine(readEXIF.getCreateDateTime());
+                if (timeline != null) {
+                    String dateString = readEXIF.getCreateDateTimeString();
+                    Double latitude = readEXIF.getGPSLatitude();
+                    Double longitude = readEXIF.getGPSLongitude();
+                    OpenStreetMapUtils.Address address = OpenStreetMapUtils.getInstance().getAddress(latitude, longitude);
+                    try {
+                        RenameFile(address, timeline, dateString, this.startDirectory, 0, file, true);
+                    } catch (Exception e) {
+                        if (logger != null) {
+                            this.logger.info(String.format("RenameRootFiles %s", e.getMessage()));
+                        }
                     }
-                }
-            } else {
-                if (logger != null) {
-                    this.logger.info(String.format("%s with %tF %tT has a creationdate before all timelines",
-                            file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
                 } else {
-                    System.out.println(String.format("%s with %tF %tT has a creationdate before all timelines",
-                            file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
+                    if (logger != null) {
+                        this.logger.info(String.format("%s with %tF %tT has a creationdate before all timelines",
+                                file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
+                    } else {
+                        System.out.println(String.format("%s with %tF %tT has a creationdate before all timelines",
+                                file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
+                    }
                 }
             }
         }
@@ -185,70 +186,70 @@ public class RenameFiles {
         } else {
             this.logger.debug("RenameTimelapsFiles: (counting=false) ReadFiles " + startDirectory);
         }
-        ReadFiles readFiles = new ReadFiles(this.startDirectory);
-        int counter = 1;
-        String referenceDate = "";
-        List<File> dirs;
-        if (counting) {
-            dirs = readFiles.getTimelapsDirectories();
-        }
-        else {
-            dirs = readFiles.getGPSDirectories();
-        }
-        for (File dir : dirs) {
-            this.logger.debug("RenameTimelapsFiles: readFiles.getTimelapsFiles " + dir.getPath());
-            List<File> timelapsFiles = readFiles.getTimelapsFiles(dir);
-            if (timelapsFiles.size() > 0) {
-                // take the last file where GPS data is to be expected and fix the date
-                File file = timelapsFiles.get(timelapsFiles.size() - 1);
-                this.logger.debug("RenameTimelapsFiles: ReadEXIF " + file.getPath());
-                ReadEXIF readEXIF = new ReadEXIF(file.getPath());
-                this.logger.debug("RenameTimelapsFiles: ReadEXIF " + readEXIF.getCreateDateTimeString());
-                // start counter for each new date, keep all filenames unique
-                if (referenceDate.isEmpty()) {
-                    counter = 1;
-                }
-                else {
-                    if (! referenceDate.equals(readEXIF.getCreateDateString())) {
+        if (readYaml.getEnabled()) {
+            ReadFiles readFiles = new ReadFiles(this.startDirectory);
+            int counter = 1;
+            String referenceDate = "";
+            List<File> dirs;
+            if (counting) {
+                dirs = readFiles.getTimelapsDirectories();
+            } else {
+                dirs = readFiles.getGPSDirectories();
+            }
+            for (File dir : dirs) {
+                this.logger.debug("RenameTimelapsFiles: readFiles.getTimelapsFiles " + dir.getPath());
+                List<File> timelapsFiles = readFiles.getTimelapsFiles(dir);
+                if (timelapsFiles.size() > 0) {
+                    // take the last file where GPS data is to be expected and fix the date
+                    File file = timelapsFiles.get(timelapsFiles.size() - 1);
+                    this.logger.debug("RenameTimelapsFiles: ReadEXIF " + file.getPath());
+                    ReadEXIF readEXIF = new ReadEXIF(file.getPath());
+                    this.logger.debug("RenameTimelapsFiles: ReadEXIF " + readEXIF.getCreateDateTimeString());
+                    // start counter for each new date, keep all filenames unique
+                    if (referenceDate.isEmpty()) {
                         counter = 1;
-                    }
-                }
-                referenceDate = readEXIF.getCreateDateString();
-                this.logger.debug("RenameTimelapsFiles: ReadEXIF.getCreateDateString " + referenceDate);
-                // read from Yaml file in order to retrieve some default information
-                ReadYaml.TimeLine timeline = readYaml.getTimeLine(readEXIF.getCreateDateTime());
-                if (timeline != null) {
-                    this.logger.debug("RenameTimelapsFiles: ReadEXIF.getGPSLatitude, getGPSLongitude");
-                    // retrieve if possible GPS coordinates
-                    Double latitude = readEXIF.getGPSLatitude();
-                    Double longitude = readEXIF.getGPSLongitude();
-                    OpenStreetMapUtils.Address address = OpenStreetMapUtils.getInstance().getAddress(latitude, longitude);
-                    this.logger.debug(String.format("RenameTimelapsFiles: OpenStreetMapUtils latitude: %.6f, longitude: %.6f ", latitude, longitude));
-                    for (File timelapsFile : timelapsFiles) {
-                        if (! counting) {
-                            // not counting means no counter will be added instead the time will be used
-                            readEXIF = new ReadEXIF(timelapsFile.getPath());
-                            referenceDate = readEXIF.getCreateDateTimeString();
-                            counter = 0;
+                    } else {
+                        if (!referenceDate.equals(readEXIF.getCreateDateString())) {
+                            counter = 1;
                         }
-                        RenameFile(address, timeline, referenceDate, dir.getPath(), counter, timelapsFile, false);
+                    }
+                    referenceDate = readEXIF.getCreateDateString();
+                    this.logger.debug("RenameTimelapsFiles: ReadEXIF.getCreateDateString " + referenceDate);
+                    // read from Yaml file in order to retrieve some default information
+                    ReadYaml.TimeLine timeline = readYaml.getTimeLine(readEXIF.getCreateDateTime());
+                    if (timeline != null) {
+                        this.logger.debug("RenameTimelapsFiles: ReadEXIF.getGPSLatitude, getGPSLongitude");
+                        // retrieve if possible GPS coordinates
+                        Double latitude = readEXIF.getGPSLatitude();
+                        Double longitude = readEXIF.getGPSLongitude();
+                        OpenStreetMapUtils.Address address = OpenStreetMapUtils.getInstance().getAddress(latitude, longitude);
+                        this.logger.debug(String.format("RenameTimelapsFiles: OpenStreetMapUtils latitude: %.6f, longitude: %.6f ", latitude, longitude));
+                        for (File timelapsFile : timelapsFiles) {
+                            if (!counting) {
+                                // not counting means no counter will be added instead the time will be used
+                                readEXIF = new ReadEXIF(timelapsFile.getPath());
+                                referenceDate = readEXIF.getCreateDateTimeString();
+                                counter = 0;
+                            }
+                            RenameFile(address, timeline, referenceDate, dir.getPath(), counter, timelapsFile, false);
 //                        RenameTimelapsFile(address, timeline, referenceDate, dir.getPath(), counter, timelapsFile);
-                        counter++;
+                            counter++;
+                        }
+                    } else {
+                        if (logger != null) {
+                            this.logger.info(String.format("%s with %tF %tT has a creationdate before all timelines",
+                                    file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
+                        } else {
+                            System.out.println(String.format("%s with %tF %tT has a creationdate before all timelines",
+                                    file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
+                        }
                     }
                 } else {
                     if (logger != null) {
-                        this.logger.info(String.format("%s with %tF %tT has a creationdate before all timelines",
-                                file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
+                        this.logger.info(String.format("No files in %s", dir.getPath()));
                     } else {
-                        System.out.println(String.format("%s with %tF %tT has a creationdate before all timelines",
-                                file.getName(), readEXIF.getCreateDateTime(), readEXIF.getCreateDateTime()));
+                        System.out.println(String.format("No files in %s", dir.getPath()));
                     }
-                }
-            } else {
-                if (logger != null) {
-                    this.logger.info(String.format("No files in %s", dir.getPath()));
-                } else {
-                    System.out.println(String.format("No files in %s", dir.getPath()));
                 }
             }
         }

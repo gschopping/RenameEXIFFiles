@@ -270,6 +270,12 @@ public class stepDefinitions {
         Assert.assertEquals(errorMessage, this.errorMessage);
     }
 
+    @Then("variable enabled should be set to false")
+    public void variableEnabledShouldBeSetToFalse() {
+        Assert.assertEquals(this.readYaml.getEnabled(),false);
+    }
+
+
     // Directory feature =========================================================
 
     @Given("directory {string}")
@@ -371,4 +377,5 @@ public class stepDefinitions {
         this.renameFiles = new RenameFiles(null, this.directory, this.configFile);
         this.renameFiles.RenameTimelapsFiles(true);
     }
+
 }

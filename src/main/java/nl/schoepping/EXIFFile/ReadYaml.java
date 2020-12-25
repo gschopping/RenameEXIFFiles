@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReadYaml {
+    private Boolean Enabled = true;
     private List<TimeLine> timeLines;
 
     public static class TimeLine {
@@ -179,6 +180,14 @@ public class ReadYaml {
             InputStream input = new FileInputStream(new File(configFile));
             Yaml yaml = new Yaml();
             Map timeLine = yaml.load(input);
+//            retrieve values for config
+            if (timeLine.get("config") != null) {
+                Map config = (Map) timeLine.get("config");
+                if (config.get("enabled") != null) {
+                    this.Enabled = (Boolean) config.get("enabled");
+                }
+            }
+
             if (timeLine.get("timeline") != null) {
                 ArrayList<Map> timelineArray = (ArrayList<Map>) timeLine.get("timeline");
                 for (Map timelineItem : timelineArray) {
@@ -339,6 +348,10 @@ public class ReadYaml {
             }
         }
         return result;
+    }
+
+    public Boolean getEnabled() {
+        return this.Enabled;
     }
 
 }

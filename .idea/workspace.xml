@@ -7,12 +7,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5584f33d-49b7-4ef8-8a08-749d41c8307c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/features/CreateDate.feature" beforeDir="false" afterPath="$PROJECT_DIR$/features/CreateDate.feature" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/features/Yaml.feature" beforeDir="false" afterPath="$PROJECT_DIR$/features/Yaml.feature" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/nl/schoepping/EXIFFile/OpenStreetMapUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/nl/schoepping/EXIFFile/OpenStreetMapUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/nl/schoepping/EXIFFile/ReadYaml.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/nl/schoepping/EXIFFile/ReadYaml.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/nl/schoepping/EXIFFile/RenameFiles.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/nl/schoepping/EXIFFile/RenameFiles.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/stepDefinitions/stepDefinitions.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/stepDefinitions/stepDefinitions.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/testRunner/TestRunner.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/testRunner/TestRunner.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/stepDefinitions/stepDefinitions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/stepDefinitions/stepDefinitions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/nl/schoepping/EXIFFile/ReadYaml$SortbyDate.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/nl/schoepping/EXIFFile/ReadYaml$SortbyDate.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/nl/schoepping/EXIFFile/ReadYaml$TimeLine.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/nl/schoepping/EXIFFile/ReadYaml$TimeLine.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/nl/schoepping/EXIFFile/ReadYaml.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/nl/schoepping/EXIFFile/ReadYaml.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/nl/schoepping/EXIFFile/RenameFiles.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/nl/schoepping/EXIFFile/RenameFiles.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,7 +67,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/src/test/java" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/features/CreateDate.feature" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.66206896" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
@@ -74,7 +78,7 @@
       <recent name="Z:\workspace\RenameEXIFFiles\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="Cucumber java.Feature: CreateDate">
+  <component name="RunManager" selected="Cucumber java.Feature: Yaml">
     <configuration name="RenameEXIFFiles" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="ALTERNATIVE_JRE_PATH" value="13" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
@@ -284,6 +288,8 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cucumber java.Feature: Yaml" />
+        <item itemvalue="Cucumber java.Feature: GPSTags" />
         <item itemvalue="Cucumber java.Feature: CreateDate" />
         <item itemvalue="Application.RenameEXIFFiles" />
         <item itemvalue="Application.main" />
@@ -312,13 +318,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1570369886798</updated>
-    </task>
-    <task id="LOCAL-00001" summary="Initial setup">
-      <created>1570466386555</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1570466386555</updated>
     </task>
     <task id="LOCAL-00002" summary="Rename project">
       <created>1570466600210</created>
@@ -656,7 +655,14 @@
       <option name="project" value="LOCAL" />
       <updated>1575040858018</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="Jump to next file if error">
+      <created>1608469852255</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1608469852257</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -676,7 +682,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RenameEXIFFiles" />
     </ignored-roots>
-    <MESSAGE value="Yaml and timezone: switch to string" />
     <MESSAGE value="Update Yaml feature file" />
     <MESSAGE value="Read media files from one directory" />
     <MESSAGE value="Feature Read Files" />
@@ -701,12 +706,41 @@
     <MESSAGE value="Avoid non ASCII characters in filename" />
     <MESSAGE value="Creation date retrieval updated" />
     <MESSAGE value="Code cleanup" />
-    <option name="LAST_COMMIT_MESSAGE" value="Code cleanup" />
+    <MESSAGE value="Jump to next file if error" />
+    <option name="LAST_COMMIT_MESSAGE" value="Jump to next file if error" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="656" y="343" key="com.intellij.ide.util.TipDialog" timestamp="1608469002751">
+    <state x="552" y="178" key="#Project_Structure" timestamp="1608492614084">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="656" y="343" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1608469002751" />
+    <state x="552" y="178" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1608492614084" />
+    <state x="614" y="114" key="CommitChangelistDialog2" timestamp="1608469848181">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="614" y="114" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1608469848181" />
+    <state width="1877" height="282" key="GridCell.Tab.0.bottom" timestamp="1608891387410">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1608891387410" />
+    <state width="1877" height="282" key="GridCell.Tab.0.center" timestamp="1608891387410">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1608891387410" />
+    <state width="1877" height="282" key="GridCell.Tab.0.left" timestamp="1608891387409">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1608891387409" />
+    <state width="1877" height="282" key="GridCell.Tab.0.right" timestamp="1608891387410">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1608891387410" />
+    <state x="552" y="252" key="Vcs.Push.Dialog.v2" timestamp="1608469874025">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="252" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1608469874025" />
+    <state x="656" y="343" key="com.intellij.ide.util.TipDialog" timestamp="1608888962147">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="656" y="343" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1608888962147" />
   </component>
 </project>

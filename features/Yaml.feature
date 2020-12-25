@@ -61,3 +61,7 @@ Feature: read Yaml file
   Scenario: startdate not filled
     Given configuration file "null_date.yml"
     Then an error "Error in timeline 1, startdate is not filled" should be shown
+
+  Scenario: configuration file is set to disabled
+    Given configuration file "disabled.yml"
+    Then variable enabled should be set to false
